@@ -1,6 +1,7 @@
 import { Register } from "./view/pages/Register";
-import { Login } from "./view/pages/Register";
-import { Home } from "./view/pages/Register";
+import { Login } from "./view/pages/Login";
+import { Home } from "./view/pages/Home";
+import { useState } from "react";
 
 export function App() {
   const [view, setView] = useState(sessionStorage.token ? 'home' : 'login')
