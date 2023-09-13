@@ -40,7 +40,7 @@ const { authenticateUser,
 
 const { MONGODB_URL, PORT, JWT_SECRET } = process.env
 
-mongoose.connect(`${MONGODB_URL}/instaflan-data`)
+mongoose.connect(MONGODB_URL)
     .then(() => {
 
         const api = express()
