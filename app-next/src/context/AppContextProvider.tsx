@@ -13,6 +13,7 @@ interface User {
   id: string;
   name?: string;
   photo?: string;
+  description?: string;
 }
 
 interface AppContextType {

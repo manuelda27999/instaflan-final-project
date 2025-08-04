@@ -1,3 +1,5 @@
+"use client";
+
 import "./globals.css";
 import { AppContextProvider } from "@/context/AppContextProvider";
 

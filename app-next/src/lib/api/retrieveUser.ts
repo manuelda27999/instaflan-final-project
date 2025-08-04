@@ -9,7 +9,7 @@ export default function retrieveUser(userId: string) {
     throw new Error("API URL is not defined in environment variables.");
   }
 
-  return fetch("${apiUrl}/users", {
+  return fetch(`${apiUrl}/users`, {
     headers: {
       Authorization: `Bearer ${userId}`,
     },

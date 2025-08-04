@@ -1,6 +1,15 @@
 import { validateId } from "./helpers/validators";
 
-export default function retrievePost(userId: string, postId: string) {
+interface Post {
+  id: string;
+  image: string;
+  text: string;
+}
+
+export default function retrievePost(
+  userId: string,
+  postId: string
+): Promise<Post> {
   validateId(userId);
   validateId(postId);
 

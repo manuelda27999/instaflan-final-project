@@ -1,7 +1,7 @@
 "use client";
 
 import authenticateUser from "@/lib/api/authenticateUser";
-import context from "@/lib/api/helpers/context";
+import cookiesToken from "@/lib/api/helpers/cookiesToken";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -19,7 +19,7 @@ export default function Login() {
     try {
       authenticateUser(email, password)
         .then((result) => {
-          context.token = result;
+          cookiesToken.set(result);
 
           router.push("/home");
         })
@@ -32,7 +32,7 @@ export default function Login() {
   };
 
   return (
-    <main className="bg-color5 flex flex-col justify-start h-screen p-5">
+    <main className="bg-color5 flex flex-col justify-start h-screen p-5 w-full">
       <form onSubmit={handleLoginSubmit} className="">
         <h2 className="text-5xl text-color1 mb-6 font-semibold">Login</h2>
         <div className="flex flex-col justify-start items-start mb-4">
@@ -44,7 +44,7 @@ export default function Login() {
           </label>
           <input
             id="email"
-            className="p-2 rounded-xl border-color2 border-2 w-full"
+            className="p-2 rounded-xl border-color2 border-2 w-full bg-white"
             placeholder="email"
             type="email"
           />
@@ -58,7 +58,7 @@ export default function Login() {
           </label>
           <input
             id="password"
-            className="p-2 rounded-xl border-color2 border-2 w-full"
+            className="p-2 rounded-xl border-color2 border-2 w-full bg-white"
             placeholder="password"
             type="password"
           />

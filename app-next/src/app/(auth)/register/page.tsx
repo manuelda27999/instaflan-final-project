@@ -29,7 +29,7 @@ export default function Register() {
   };
 
   return (
-    <main className="bg-color5 flex flex-col justify-start h-screen p-5">
+    <main className="bg-color5 w-full flex flex-col justify-start h-screen p-5">
       <form onSubmit={handleRegister} className="">
         <h2 className="text-5xl text-color1 mb-6 font-semibold">Register</h2>
         <div className="flex flex-col justify-start items-start mb-4">
@@ -41,7 +41,7 @@ export default function Register() {
           </label>
           <input
             id="name"
-            className="p-2 rounded-xl border-color2 border-2 w-full"
+            className="p-2 rounded-xl border-color2 border-2 w-full bg-white"
             placeholder="name"
             type="text"
           />
@@ -55,7 +55,7 @@ export default function Register() {
           </label>
           <input
             id="email"
-            className="p-2 rounded-xl border-color2 border-2 w-full"
+            className="p-2 rounded-xl border-color2 border-2 w-full bg-white"
             placeholder="email"
             type="email"
           />
@@ -69,7 +69,7 @@ export default function Register() {
           </label>
           <input
             id="password"
-            className="p-2 rounded-xl border-color2 border-2 w-full"
+            className="p-2 rounded-xl border-color2 border-2 w-full bg-white"
             placeholder="password"
             type="password"
           />

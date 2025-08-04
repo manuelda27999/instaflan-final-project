@@ -1,37 +1,39 @@
 "use client";
 
-import { useState, useEffect, useRef, useContext } from "react";
-import Link from "next/link";
+import { useState, useEffect, useRef, use } from "react";
 import { usePathname, useRouter } from "next/navigation";
 
-import { AppContextProvider } from "@/context/AppContextProvider";
+import { useAppContext } from "@/context/AppContextProvider";
 import CreatePostModal from "@/app/components/modals/CreatePostModal";
 import UsersSearchModal from "@/app/components/modals/UsersSearchModal";
 import NavBar from "../components/NavBar";
+import cookiesToken from "@/lib/api/helpers/cookiesToken";
+
+interface User {
+  id: string;
+  name: string;
+  image: string;
+}
 
 export default function MainLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const inputRef = useRef<HTMLInputElement | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const modalRef = useRef<HTMLDivElement | null>(null);
   const pathname = usePathname();
   const router = useRouter();
 
-  const { user, setUser } = useContext(AppContextProvider);
+  const { user, setUser } = useAppContext();
 
   const [page, setPage] = useState("Instaflan");
   const [searchModal, setSearchModal] = useState<string | null>(null);
   const [modal, setModal] = useState<string | null>(null);
-  const [users, setUsers] = useState(null);
+  const [users, setUsers] = useState<User[]>([]);
   const [messagesNotReading, setMessagesNotReading] = useState(0);
 
   useEffect(() => {
-    // TODO: Replace with real token and fetch logic
-    const token = localStorage.getItem("token");
-    if (!token) router.push("/login");
-
     const firstRouteElement = pathname.split("/")[2];
     switch (firstRouteElement) {
       case "home":
@@ -65,6 +67,12 @@ export default function MainLayout({
     document.addEventListener("click", handleClickOutside);
     return () => document.removeEventListener("click", handleClickOutside);
   }, [pathname]);
+
+  useEffect(() => {
+    const token = cookiesToken.get();
+
+    if (!token) router.push("/login");
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("token");

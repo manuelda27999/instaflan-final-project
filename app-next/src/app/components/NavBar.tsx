@@ -1,5 +1,9 @@
+"use client";
+
+import extractUserIdFromToken from "@/lib/api/helpers/extractUserIdFromToken";
+import cookiesToken from "@/lib/api/helpers/cookiesToken";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface NavBarProps {
   user: any;
@@ -12,7 +16,18 @@ export default function NavBar({
   handleCreatePostModal,
   messagesNotReading,
 }: NavBarProps) {
-  const [userIdProfile, setUserIdProfile] = useState(user.id);
+  const [userIdProfile, setUserIdProfile] = useState<string | null>(null);
+
+  useEffect(() => {
+    const token = cookiesToken.get();
+
+    if (token) {
+      const userId = extractUserIdFromToken(token);
+      setUserIdProfile(userId);
+    } else {
+      setUserIdProfile(null);
+    }
+  }, []);
 
   return (
     <nav className="w-full h-16 bg-color5 fixed bottom-0 left-0 flex justify-around items-center">
@@ -29,7 +44,7 @@ export default function NavBar({
         🌍
       </Link>
       <button
-        onClick={() => handleCreatePostModal}
+        onClick={handleCreatePostModal}
         className="text-white text-2xl mx-2 no-underline border-b-2 border-transparent transition-transform duration-200 hover:scale-125"
       >
         ➕
