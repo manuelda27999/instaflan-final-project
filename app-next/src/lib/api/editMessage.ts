@@ -1,4 +1,4 @@
-import { validateId, validateText } from "./helpers/validators";
+import { validateId, validateText } from "../helpers/validators";
 
 export default function editMessage(
   userId: string,

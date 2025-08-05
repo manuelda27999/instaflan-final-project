@@ -1,4 +1,4 @@
-import { validateId, validateImage, validateText } from "./helpers/validators";
+import { validateId, validateImage, validateText } from "../helpers/validators";
 
 export default function createNewPost(
   author: string,

@@ -1,16 +1,28 @@
+"use client";
+
 import deleteMessage from "@/lib/api/deleteMessage";
 import editMessage from "@/lib/api/editMessage";
-import context from "@/lib/api/helpers/context";
+import cookiesToken from "@/lib/helpers/cookiesToken";
 
 interface EditDeleteMessageModalProps {
-  message: { id: string; text: string };
+  message: Message;
   onHideEditDeletePost: () => void;
+}
+
+interface Message {
+  author: string;
+  delete?: boolean;
+  edit?: boolean;
+  id: string;
+  text: string;
 }
 
 export default function EditDeleteMessageModal(
   props: EditDeleteMessageModalProps
 ) {
   const message = props.message;
+
+  const token = cookiesToken.get();
 
   const handleEditMessage = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -19,7 +31,7 @@ export default function EditDeleteMessageModal(
     const text = (form.elements.namedItem("text") as HTMLInputElement).value;
 
     try {
-      editMessage(context.token, message.id, text)
+      editMessage(token, message.id, text)
         .then(() => {
           props.onHideEditDeletePost();
         })
@@ -33,7 +45,7 @@ export default function EditDeleteMessageModal(
 
   const handleDeleteMessage = () => {
     try {
-      deleteMessage(context.token, message.id)
+      deleteMessage(token, message.id)
         .then(() => {
           props.onHideEditDeletePost();
         })

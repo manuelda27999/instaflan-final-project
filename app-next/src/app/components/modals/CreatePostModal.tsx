@@ -1,5 +1,7 @@
+"use client";
+
 import createNewPost from "@/lib/api/createNewPost";
-import cookiesToken from "@/lib/api/helpers/cookiesToken";
+import cookiesToken from "@/lib/helpers/cookiesToken";
 
 interface CreatePostModalProps {
   onCreatePost: () => void;

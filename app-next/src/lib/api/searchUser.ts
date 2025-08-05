@@ -1,4 +1,4 @@
-import { validateId } from "./helpers/validators";
+import { validateId } from "../helpers/validators";
 
 export default function searchUser(userId: string, text: string) {
   validateId(userId);

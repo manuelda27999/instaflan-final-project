@@ -1,5 +1,7 @@
+"use client";
+
 import deletePost from "@/lib/api/deletePost";
-import cookiesToken from "@/lib/api/helpers/cookiesToken";
+import cookiesToken from "@/lib/helpers/cookiesToken";
 
 interface DeletePostModalProps {
   postId: string;

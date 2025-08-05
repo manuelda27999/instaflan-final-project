@@ -1,31 +1,45 @@
 "use client";
 
-import extractUserIdFromToken from "@/lib/api/helpers/extractUserIdFromToken";
-import cookiesToken from "@/lib/api/helpers/cookiesToken";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
+import extractUserIdFromToken from "@/lib/helpers/extractUserIdFromToken";
+import cookiesToken from "@/lib/helpers/cookiesToken";
+import retrieveUser from "@/lib/api/retrieveUser";
+
 interface NavBarProps {
-  user: any;
   handleCreatePostModal: () => void;
   messagesNotReading: number;
 }
 
+interface User {
+  id: string;
+  name: string;
+  image: string;
+}
+
 export default function NavBar({
-  user,
   handleCreatePostModal,
   messagesNotReading,
 }: NavBarProps) {
   const [userIdProfile, setUserIdProfile] = useState<string | null>(null);
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
     const token = cookiesToken.get();
 
-    if (token) {
-      const userId = extractUserIdFromToken(token);
-      setUserIdProfile(userId);
-    } else {
-      setUserIdProfile(null);
+    const userId = extractUserIdFromToken(token);
+
+    setUserIdProfile(userId);
+
+    try {
+      retrieveUser(token)
+        .then((userData) => {
+          setUser(userData);
+        })
+        .catch((error) => alert(error.message));
+    } catch (error: any) {
+      alert(error.message);
     }
   }, []);
 
@@ -69,7 +83,6 @@ export default function NavBar({
         ❤️
       </Link>
       <Link
-        onClick={() => setUserIdProfile(user.id)}
         className="text-white text-2xl mx-2 no-underline border-b-2 border-transparent transition-transform duration-200 hover:scale-125"
         href={`/profile/${userIdProfile}/posts`}
       >

@@ -3,7 +3,7 @@ import {
   validateImage,
   validateText,
   validateName,
-} from "./helpers/validators";
+} from "../helpers/validators";
 
 export default function editUser(
   userId: string,

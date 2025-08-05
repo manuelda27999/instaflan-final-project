@@ -1,5 +1,7 @@
+"use client";
+
 import createComment from "@/lib/api/createComment";
-import cookiesToken from "@/lib/api/helpers/cookiesToken";
+import cookiesToken from "@/lib/helpers/cookiesToken";
 
 interface CreateCommentModalProps {
   postId: string;

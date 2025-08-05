@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import cookiesToken from "@/lib/api/helpers/cookiesToken";
-import extractUserIdFromToken from "@/lib/api/helpers/extractUserIdFromToken";
+import cookiesToken from "@/lib/helpers/cookiesToken";
+import extractUserIdFromToken from "@/lib/helpers/extractUserIdFromToken";
 import retrievePosts from "@/lib/api/retrievePosts";
 import toggleFavPost from "@/lib/api/toggleFavPost";
 import CreateCommentModal from "@/app/components/modals/CreateCommentModal";
@@ -61,7 +61,7 @@ export default function AllPosts() {
         alert(error.message);
       }
     }
-  }, [posts]);
+  }, [posts.length]);
 
   const handleEditPostModal = (postId: string) => {
     setPostId(postId);

@@ -1,4 +1,4 @@
-import { validateId } from "./helpers/validators";
+import { validateId } from "../helpers/validators";
 
 export default function toggleFavPost(userId: string, postId: string) {
   validateId(userId);

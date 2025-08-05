@@ -1,7 +1,7 @@
 "use client";
 
 import authenticateUser from "@/lib/api/authenticateUser";
-import cookiesToken from "@/lib/api/helpers/cookiesToken";
+import cookiesToken from "@/lib/helpers/cookiesToken";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import context from "@/lib/api/helpers/context";
 import retrieveFollowed from "@/lib/api/retrieveFollowed";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
+import cookiesToken from "@/lib/helpers/cookiesToken";
 
 interface FollowedModalProps {
   onHideFollowedModal: () => void;
@@ -15,15 +15,16 @@ interface User {
 }
 
 export default function FollowedModal(props: FollowedModalProps) {
+  const token = cookiesToken.get();
   const [users, setUsers] = useState<User[]>([]);
   const router = useRouter();
 
-  const params = useParams();
-  const userIdProfile = params.userIdProfile as string; // Cast to string
+  const pathname = usePathname();
+  const userIdProfile = pathname.split("/")[2];
 
   useEffect(() => {
     try {
-      retrieveFollowed(context.token, userIdProfile)
+      retrieveFollowed(token, userIdProfile)
         .then((users) => setUsers(users))
         .catch((error) => alert(error.message));
     } catch (error: any) {

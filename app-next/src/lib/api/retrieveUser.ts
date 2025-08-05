@@ -1,7 +1,7 @@
-import { validateId } from "./helpers/validators";
+import { validateId } from "../helpers/validators";
 
-export default function retrieveUser(userId: string) {
-  validateId(userId);
+export default function retrieveUser(token: string) {
+  validateId(token);
 
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -11,7 +11,7 @@ export default function retrieveUser(userId: string) {
 
   return fetch(`${apiUrl}/users`, {
     headers: {
-      Authorization: `Bearer ${userId}`,
+      Authorization: `Bearer ${token}`,
     },
   }).then((res) => {
     if (res.status === 200) {

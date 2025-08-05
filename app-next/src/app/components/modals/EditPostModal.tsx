@@ -1,5 +1,7 @@
+"use client";
+
 import { useState, useEffect } from "react";
-import cookiesToken from "@/lib/api/helpers/cookiesToken";
+import cookiesToken from "@/lib/helpers/cookiesToken";
 import retrievePost from "@/lib/api/retrievePost";
 import editPost from "@/lib/api/editPost";
 

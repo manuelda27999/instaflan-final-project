@@ -1,4 +1,4 @@
-import { validateId } from "./helpers/validators";
+import { validateId } from "../helpers/validators";
 
 interface Post {
   id: string;

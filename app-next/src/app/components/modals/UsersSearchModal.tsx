@@ -1,5 +1,6 @@
+"use client";
+
 import { useEffect, useState } from "react";
-import context from "@/lib/api/helpers/context";
 import { useRouter } from "next/navigation";
 
 interface UsersSearchModalProps {

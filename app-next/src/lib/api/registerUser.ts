@@ -2,7 +2,7 @@ import {
   validateName,
   validateEmail,
   validatePassword,
-} from "./helpers/validators";
+} from "../helpers/validators";
 
 export default function registerUser(
   name: string,

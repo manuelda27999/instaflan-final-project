@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useEffect, useRef, use } from "react";
+import { useState, useEffect, useRef } from "react";
 import { usePathname, useRouter } from "next/navigation";
 
-import { useAppContext } from "@/context/AppContextProvider";
 import CreatePostModal from "@/app/components/modals/CreatePostModal";
 import UsersSearchModal from "@/app/components/modals/UsersSearchModal";
 import NavBar from "../components/NavBar";
-import cookiesToken from "@/lib/api/helpers/cookiesToken";
+import cookiesToken from "@/lib/helpers/cookiesToken";
+import usePageTitle from "@/lib/hooks/usePageTittle";
 
 interface User {
   id: string;
@@ -25,8 +25,6 @@ export default function MainLayout({
   const pathname = usePathname();
   const router = useRouter();
 
-  const { user, setUser } = useAppContext();
-
   const [page, setPage] = useState("Instaflan");
   const [searchModal, setSearchModal] = useState<string | null>(null);
   const [modal, setModal] = useState<string | null>(null);
@@ -34,26 +32,7 @@ export default function MainLayout({
   const [messagesNotReading, setMessagesNotReading] = useState(0);
 
   useEffect(() => {
-    const firstRouteElement = pathname.split("/")[2];
-    switch (firstRouteElement) {
-      case "home":
-        setPage("Instaflan");
-        break;
-      case "explorer":
-        setPage("Explorer");
-        break;
-      case "messages":
-        setPage("Messages");
-        break;
-      case "notifications":
-        setPage("Notifications");
-        break;
-      case "profile":
-        setPage("Profile");
-        break;
-      default:
-        setPage("Instaflan");
-    }
+    setPage(usePageTitle(pathname));
 
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -115,7 +94,6 @@ export default function MainLayout({
       <main className="pt-16 pb-16">{children}</main>
 
       <NavBar
-        user={user}
         handleCreatePostModal={handleCreatePostModal}
         messagesNotReading={messagesNotReading}
       />

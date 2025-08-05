@@ -1,7 +1,12 @@
+"use client";
+
 const cookiesToken = {
-  get(): string | null {
+  get(): string {
     const match = document.cookie.match(new RegExp("(^| )token=([^;]+)"));
-    return match ? match[2] : null;
+
+    if (!match) throw new Error("Token not found in cookies");
+
+    return match[2];
   },
 
   set(token: string, days: number = 7): void {

@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
-import context from "@/lib/api/helpers/context";
+import { usePathname, useRouter } from "next/navigation";
+import cookiesToken from "@/lib/helpers/cookiesToken";
 import toggleFollowUser from "@/lib/api/toggleFollowUser";
 import retrieveFollowing from "@/lib/api/retrieveFollowing";
-import extractUserIdFromToken from "@/lib/api/helpers/extractUserIdFromToken";
+import extractUserIdFromToken from "@/lib/helpers/extractUserIdFromToken";
 
 interface FollowedModalProps {
   onHideFollowingModal: () => void;
@@ -17,17 +17,18 @@ interface User {
 }
 
 export default function FollowingModal(props: FollowedModalProps) {
+  const token = cookiesToken.get();
   const [users, setUsers] = useState<User[]>([]);
   const router = useRouter();
 
-  const params = useParams();
-  const userIdProfile = params.userIdProfile as string;
+  const pathname = usePathname();
+  const userIdProfile = pathname.split("/")[2];
 
-  const userId = extractUserIdFromToken(context.token);
+  const userId = extractUserIdFromToken(token);
 
   useEffect(() => {
     try {
-      retrieveFollowing(context.token, userIdProfile)
+      retrieveFollowing(token, userIdProfile)
         .then((users) => setUsers(users))
         .catch((error: any) => alert(error.message));
     } catch (error: any) {
@@ -50,7 +51,7 @@ export default function FollowingModal(props: FollowedModalProps) {
 
   function handleFollowUser(userFollowId: string) {
     try {
-      toggleFollowUser(context.token, userFollowId)
+      toggleFollowUser(token, userFollowId)
         .then(() => {
           setUsers((users) => {
             const users2 = [...users];

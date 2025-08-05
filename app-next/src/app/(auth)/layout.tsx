@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import cookiesToken from "@/lib/api/helpers/cookiesToken";
+import cookiesToken from "@/lib/helpers/cookiesToken";
 import { useRouter } from "next/navigation";
 
 export default function AuthLayout({

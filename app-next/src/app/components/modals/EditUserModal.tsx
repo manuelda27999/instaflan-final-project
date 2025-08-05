@@ -1,7 +1,7 @@
-import { useContext } from "react";
-import editUser from "@/lib/api/editUser";
+"use client";
 
-import context from "@/lib/api/helpers/context";
+import editUser from "@/lib/api/editUser";
+import cookiesToken from "@/lib/helpers/cookiesToken";
 import { useAppContext } from "@/context/AppContextProvider";
 
 interface EditUserModalProps {
@@ -11,6 +11,7 @@ interface EditUserModalProps {
 
 export default function EditUserModal(props: EditUserModalProps) {
   const { user, setUser } = useAppContext();
+  const token = cookiesToken.get();
 
   const handleSubmitUser = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -23,7 +24,7 @@ export default function EditUserModal(props: EditUserModalProps) {
     ).value;
 
     try {
-      editUser(context.token, name, image, description)
+      editUser(token, name, image, description)
         .then(() => {
           props.onEditUser();
         })

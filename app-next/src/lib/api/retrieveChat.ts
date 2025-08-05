@@ -1,4 +1,4 @@
-import { validateId } from "./helpers/validators";
+import { validateId } from "../helpers/validators";
 
 export default function retrieveChat(userId: string, chatId: string) {
   validateId(userId);

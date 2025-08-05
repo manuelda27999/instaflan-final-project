@@ -1,4 +1,4 @@
-import { validateEmail, validatePassword } from "./helpers/validators";
+import { validateEmail, validatePassword } from "../helpers/validators";
 
 export default function authenticateUser(
   email: string,
