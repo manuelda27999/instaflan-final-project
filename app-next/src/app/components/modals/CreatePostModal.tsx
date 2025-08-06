@@ -19,15 +19,13 @@ export default function CreatePostModal(props: CreatePostModalProps) {
     try {
       const token = cookiesToken.get();
 
-      if (token) {
-        createNewPost(token, image, text)
-          .then(() => {
-            props.onCreatePost();
-          })
-          .catch((error) => {
-            alert(error.message);
-          });
-      }
+      createNewPost(token, image, text)
+        .then(() => {
+          props.onCreatePost();
+        })
+        .catch((error) => {
+          alert(error.message);
+        });
     } catch (error: any) {
       alert(error.message);
     }

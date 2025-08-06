@@ -23,7 +23,7 @@ export default function createComment(
     },
     body: JSON.stringify({ text }),
   }).then((res) => {
-    if (res.status === 201) {
+    if (res.status === 200) {
       return;
     } else if (res.status === 400) {
       return res.json().then((body) => {

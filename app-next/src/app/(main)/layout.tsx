@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 import CreatePostModal from "@/app/components/modals/CreatePostModal";
 import Header from "../components/Header";
@@ -16,7 +16,6 @@ export default function MainLayout({
   const router = useRouter();
 
   const [modal, setModal] = useState<string | null>(null);
-  const [messagesNotReading, setMessagesNotReading] = useState(0);
 
   useEffect(() => {
     const token = cookiesToken.exist();
@@ -24,7 +23,13 @@ export default function MainLayout({
     if (!token) router.push("/login");
   }, []);
 
-  const handleCreatePostModal = () => setModal("create-post-modal");
+  const handleShowCreatePostModal = () => setModal("create-post-modal");
+
+  const handlePostCreated = () => {
+    setModal(null);
+
+    router.refresh();
+  };
 
   return (
     <div className="w-full h-full">
@@ -32,14 +37,11 @@ export default function MainLayout({
 
       <main className="pt-16 pb-16">{children}</main>
 
-      <NavBar
-        handleCreatePostModal={handleCreatePostModal}
-        messagesNotReading={messagesNotReading}
-      />
+      <NavBar handleCreatePostModal={handleShowCreatePostModal} />
 
       {modal === "create-post-modal" && (
         <CreatePostModal
-          onCreatePost={() => setModal(null)}
+          onCreatePost={handlePostCreated}
           onHideCreatePost={() => setModal(null)}
         />
       )}

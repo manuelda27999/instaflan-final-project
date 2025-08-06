@@ -9,7 +9,6 @@ import retrieveUser from "@/lib/api/retrieveUser";
 
 interface NavBarProps {
   handleCreatePostModal: () => void;
-  messagesNotReading: number;
 }
 
 interface User {
@@ -18,12 +17,10 @@ interface User {
   image: string;
 }
 
-export default function NavBar({
-  handleCreatePostModal,
-  messagesNotReading,
-}: NavBarProps) {
+export default function NavBar(props: NavBarProps) {
   const [userIdProfile, setUserIdProfile] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
+  const [messagesNotReading, setMessagesNotReading] = useState<number>(0);
 
   useEffect(() => {
     const token = cookiesToken.get();
@@ -58,7 +55,7 @@ export default function NavBar({
         🌍
       </Link>
       <button
-        onClick={handleCreatePostModal}
+        onClick={props.handleCreatePostModal}
         className="text-white text-2xl mx-2 no-underline border-b-2 border-transparent transition-transform duration-200 hover:scale-125"
       >
         ➕

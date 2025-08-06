@@ -1,11 +1,9 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { useRouter } from "next/navigation";
 import cookiesToken from "@/lib/helpers/cookiesToken";
 import searchUser from "@/lib/api/searchUser";
-
-interface UsersSearchModalProps {}
+import Link from "next/link";
 
 interface User {
   id: string;
@@ -13,9 +11,7 @@ interface User {
   image: string;
 }
 
-export default function UsersSearchModal(props: UsersSearchModalProps) {
-  const router = useRouter();
-
+export default function UsersSearchModal() {
   const containerRef = useRef<HTMLDivElement | null>(null);
 
   const token = cookiesToken.get();
@@ -37,14 +33,6 @@ export default function UsersSearchModal(props: UsersSearchModalProps) {
       document.removeEventListener("click", handleClickOutside);
     };
   }, []);
-
-  const handleProfile = (
-    event: React.MouseEvent<HTMLAnchorElement>,
-    userIdProfile: string
-  ) => {
-    event.preventDefault();
-    router.push(`/profile/${userIdProfile}/posts`);
-  };
 
   let searchUserTimeOutId: NodeJS.Timeout | null = null;
 
@@ -94,12 +82,12 @@ export default function UsersSearchModal(props: UsersSearchModalProps) {
                       src={user.image}
                       alt={user.name}
                     />
-                    <a
-                      onClick={(event) => handleProfile(event, user.id)}
-                      className="font-semibold text-color1 text-lg"
+                    <Link
+                      href={`/profile/${user.id}/posts`}
+                      className="font-semibold text-color1 text-lg cursor-pointer"
                     >
                       {user.name}
-                    </a>
+                    </Link>
                   </div>
                 </article>
               ))}
