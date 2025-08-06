@@ -12,7 +12,7 @@ export default function AuthLayout({
   const router = useRouter();
 
   useEffect(() => {
-    const token = cookiesToken.get();
+    const token = cookiesToken.exist();
 
     if (token) router.push("/home");
   }, []);

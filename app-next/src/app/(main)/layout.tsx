@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { usePathname, useRouter } from "next/navigation";
 
 import CreatePostModal from "@/app/components/modals/CreatePostModal";
-import UsersSearchModal from "@/app/components/modals/UsersSearchModal";
+import UsersSearchModal from "@/app/components/UsersSearchModal";
 import NavBar from "../components/NavBar";
 import cookiesToken from "@/lib/helpers/cookiesToken";
 import usePageTitle from "@/lib/hooks/usePageTittle";
@@ -26,35 +26,21 @@ export default function MainLayout({
   const router = useRouter();
 
   const [page, setPage] = useState("Instaflan");
-  const [searchModal, setSearchModal] = useState<string | null>(null);
   const [modal, setModal] = useState<string | null>(null);
-  const [users, setUsers] = useState<User[]>([]);
   const [messagesNotReading, setMessagesNotReading] = useState(0);
 
   useEffect(() => {
     setPage(usePageTitle(pathname));
-
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        !modalRef.current?.contains(event.target as Node) &&
-        !inputRef.current?.contains(event.target as Node)
-      ) {
-        setSearchModal(null);
-      }
-    };
-
-    document.addEventListener("click", handleClickOutside);
-    return () => document.removeEventListener("click", handleClickOutside);
   }, [pathname]);
 
   useEffect(() => {
-    const token = cookiesToken.get();
+    const token = cookiesToken.exist();
 
     if (!token) router.push("/login");
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    cookiesToken.delete();
     router.push("/login");
   };
 
@@ -79,15 +65,7 @@ export default function MainLayout({
             </button>
           </nav>
         ) : (
-          <div className="flex items-center">
-            <input
-              ref={inputRef}
-              onFocus={() => setSearchModal("search-modal")}
-              className="h-8 w-40 rounded-3xl pl-2"
-              type="text"
-              placeholder="search..."
-            />
-          </div>
+          <UsersSearchModal />
         )}
       </header>
 
@@ -103,9 +81,6 @@ export default function MainLayout({
           onCreatePost={() => setModal(null)}
           onHideCreatePost={() => setModal(null)}
         />
-      )}
-      {searchModal === "search-modal" && (
-        <UsersSearchModal users={users} modalRef={modalRef} />
       )}
     </div>
   );
