@@ -204,12 +204,12 @@ export default function AllPosts() {
                   src={post.author.image}
                   alt={post.author.name}
                 />
-                <a
-                  onClick={(event) => handleProfile(event, post.author.id)}
-                  className="font-semibold text-color1 text-xl"
+                <Link
+                  href={`/profile/${post.author.id}/posts`}
+                  className="font-semibold text-color1 text-xl cursor-pointer"
                 >
                   {post.author.name}
-                </a>
+                </Link>
               </div>
               <button
                 onClick={() => handletoggleFavPost(post.id)}
