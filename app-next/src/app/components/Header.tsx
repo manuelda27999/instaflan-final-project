@@ -28,7 +28,7 @@ export default function Header() {
   };
 
   return (
-    <header className="w-full h-16 bg-color5 fixed top-0 left-0 flex justify-between items-center pl-5 pr-3 z-50">
+    <header className="w-full h-16 bg-color5 fixed top-0 left-0 flex justify-between items-center pl-5 pr-3 z-10">
       <div className="flex items-center">
         <h2 className="text-xl text-color1 font-semibold">{page}</h2>
         {page === "Instaflan" && (

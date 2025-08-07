@@ -2,7 +2,12 @@
 
 import { createContext, useState, useContext, ReactNode } from "react";
 
-type ModalNames = "create-post-modal" | null;
+type ModalNames =
+  | "create-post-modal"
+  | "edit-post-modal"
+  | "delete-post-modal"
+  | "create-comment-modal"
+  | null;
 
 interface ModalContextType {
   modal: ModalNames;

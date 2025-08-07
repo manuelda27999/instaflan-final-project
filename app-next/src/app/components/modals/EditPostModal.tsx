@@ -59,7 +59,7 @@ export default function EditPostModal(props: EditPostModalProps) {
   const handleCancelEditPost = () => props.onHideEditPost();
 
   return (
-    <div className="fixed z-10 top-0 left-0 right-0 bottom-0 m-auto bg-black bg-opacity-60 w-full h-full z-2 flex flex-col items-center justify-center">
+    <div className="fixed z-30 top-0 left-0 right-0 bottom-0 m-auto bg-black/60 w-full h-full flex flex-col items-center justify-center">
       {post && (
         <form
           onSubmit={handleSubmitPost}

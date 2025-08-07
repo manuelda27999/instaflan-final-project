@@ -1,12 +1,10 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import cookiesToken from "@/lib/helpers/cookiesToken";
 import extractUserIdFromToken from "@/lib/helpers/extractUserIdFromToken";
-import EditPostModal from "./modals/EditPostModal";
-import CreateCommentModal from "./modals/CreateCommentModal";
-import DeletePostModal from "./modals/DeletePostModal";
+
+import { useModal } from "@/context/ModalContext";
 
 interface Post {
   id: string;
@@ -44,52 +42,7 @@ export default function Post(props: PostProps) {
     userId = extractUserIdFromToken(token);
   }
 
-  const [modal, setModal] = useState<string | null>(null);
-  const [postId, setPostId] = useState<string | null>(null);
-
-  const handleEditPostModal = (postId: string) => {
-    setPostId(postId);
-    setModal("edit-post-modal");
-  };
-
-  const handleCancelEditPostModal = () => setModal(null);
-
-  const handleEditPost = () => {
-    setModal(null);
-    setPostId(null);
-
-    props.updatePosts();
-  };
-
-  const handleCommentModal = (postId: string) => {
-    setPostId(postId);
-    setModal("comment-modal");
-  };
-
-  const handleCancelCommentModal = () => setModal(null);
-
-  const handleCreateComment = () => {
-    setModal(null);
-    setPostId(null);
-
-    props.updatePosts();
-  };
-
-  const handleDeletePostModal = (postId: string) => {
-    setPostId(postId);
-    setModal("delete-post-modal");
-  };
-
-  const handleCancelDeletePostModal = () => setModal(null);
-
-  const handleDeletePost = () => {
-    setModal(null);
-    setPostId(null);
-
-    props.updatePosts();
-  };
-
-  const handletoggleFavPost = () => {};
+  const { openModal } = useModal();
 
   return (
     <article key={props.post.id} className="bg-color5 mb-3">
@@ -141,7 +94,15 @@ export default function Post(props: PostProps) {
       )}
       <div className="flex justify-between w-full px-4 pb-2">
         <button
-          onClick={() => handleCommentModal(props.post.id)}
+          onClick={() =>
+            openModal("create-comment-modal", {
+              postId: props.post.id,
+              callback: (close: () => void) => {
+                props.updatePosts();
+                close();
+              },
+            })
+          }
           className="button bg-color4 text-white border-none rounded-xl px-3 py-0.5 mt-2 font-bold text-lg cursor-pointer transition duration-300 hover:bg-color3"
         >
           Comment
@@ -149,7 +110,15 @@ export default function Post(props: PostProps) {
         <div className="flex justify-between gap-2">
           {userId === props.post.author.id && (
             <button
-              onClick={() => handleEditPostModal(props.post.id)}
+              onClick={() =>
+                openModal("edit-post-modal", {
+                  postId: props.post.id,
+                  callback: (close: () => {}) => {
+                    props.updatePosts();
+                    close();
+                  },
+                })
+              }
               className="bg-color4 text-white border-none rounded-xl px-3 py-0.5 mt-2 font-bold text-lg cursor-pointer transition duration-300 hover:bg-color3"
             >
               Edit
@@ -157,7 +126,15 @@ export default function Post(props: PostProps) {
           )}
           {userId === props.post.author.id && (
             <button
-              onClick={() => handleDeletePostModal(props.post.id)}
+              onClick={() =>
+                openModal("delete-post-modal", {
+                  postId: props.post.id,
+                  callback: (close: () => {}) => {
+                    props.updatePosts();
+                    close();
+                  },
+                })
+              }
               className="button bg-color4 text-white border-none rounded-xl px-3 mt-2 py-0.5 font-bold text-lg cursor-pointer transition duration-300 hover:bg-color3"
             >
               Delete
@@ -165,28 +142,6 @@ export default function Post(props: PostProps) {
           )}
         </div>
       </div>
-
-      {modal === "delete-post-modal" && (
-        <DeletePostModal
-          postId={postId ? postId : ""}
-          onDeletePost={handleDeletePost}
-          onHideDeletePost={handleCancelDeletePostModal}
-        />
-      )}
-      {modal === "edit-post-modal" && (
-        <EditPostModal
-          postId={postId ? postId : ""}
-          onEditPost={handleEditPost}
-          onHideEditPost={handleCancelEditPostModal}
-        />
-      )}
-      {modal === "comment-modal" && (
-        <CreateCommentModal
-          postId={postId ? postId : ""}
-          onCreateComment={handleCreateComment}
-          onHideCreateComment={handleCancelCommentModal}
-        />
-      )}
     </article>
   );
 }

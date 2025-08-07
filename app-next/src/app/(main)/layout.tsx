@@ -8,6 +8,9 @@ import Header from "../components/Header";
 import NavBar from "../components/NavBar";
 import cookiesToken from "@/lib/helpers/cookiesToken";
 import { useModal } from "@/context/ModalContext";
+import CreateCommentModal from "../components/modals/CreateCommentModal";
+import DeletePostModal from "../components/modals/DeletePostModal";
+import EditPostModal from "../components/modals/EditPostModal";
 
 export default function MainLayout({
   children,
@@ -38,6 +41,33 @@ export default function MainLayout({
             modalProps?.callback?.(closeModal);
           }}
           onHideCreatePost={() => closeModal()}
+        />
+      )}
+      {modal === "create-comment-modal" && (
+        <CreateCommentModal
+          postId={modalProps?.postId}
+          onCreateComment={() => {
+            modalProps?.callback?.(closeModal);
+          }}
+          onHideCreateComment={() => closeModal()}
+        />
+      )}
+      {modal === "edit-post-modal" && (
+        <EditPostModal
+          postId={modalProps.postId}
+          onEditPost={() => {
+            modalProps?.callback?.(closeModal);
+          }}
+          onHideEditPost={() => closeModal()}
+        />
+      )}
+      {modal === "delete-post-modal" && (
+        <DeletePostModal
+          postId={modalProps.postId}
+          onDeletePost={() => {
+            modalProps?.callback?.(closeModal);
+          }}
+          onHideDeletePost={() => closeModal()}
         />
       )}
     </div>

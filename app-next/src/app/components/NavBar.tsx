@@ -7,7 +7,6 @@ import extractUserIdFromToken from "@/lib/helpers/extractUserIdFromToken";
 import cookiesToken from "@/lib/helpers/cookiesToken";
 import retrieveUser from "@/lib/api/retrieveUser";
 import retrieveChats from "@/lib/api/retrieveChats";
-import { useModal } from "@/context/ModalContext";
 
 interface User {
   id: string;
@@ -34,8 +33,6 @@ export default function NavBar() {
   const [userIdProfile, setUserIdProfile] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [messagesNotReading, setMessagesNotReading] = useState<number>(0);
-
-  const { openModal } = useModal();
 
   useEffect(() => {
     const token = cookiesToken.get();
@@ -70,7 +67,7 @@ export default function NavBar() {
   }, [messagesNotReading]);
 
   return (
-    <nav className="w-full h-16 bg-color5 fixed bottom-0 left-0 flex justify-around items-center">
+    <nav className="w-full h-16 bg-color5 fixed z-10 bottom-0 left-0 flex justify-around items-center">
       <Link
         className="text-white text-2xl mx-2 no-underline border-b-2 border-transparent transition-transform duration-200 hover:scale-125"
         href="/home"
