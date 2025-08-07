@@ -1,7 +1,7 @@
 "use client";
 
 import "./globals.css";
-import { AppContextProvider } from "@/context/AppContextProvider";
+import { ModalProvider } from "@/context/ModalContext";
 
 export default function RootLayout({
   children,
@@ -11,7 +11,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="antialiased">
-        <AppContextProvider>{children}</AppContextProvider>
+        <ModalProvider>{children}</ModalProvider>
       </body>
     </html>
   );

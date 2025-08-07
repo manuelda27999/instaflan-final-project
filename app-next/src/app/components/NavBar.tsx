@@ -6,10 +6,8 @@ import { useEffect, useState } from "react";
 import extractUserIdFromToken from "@/lib/helpers/extractUserIdFromToken";
 import cookiesToken from "@/lib/helpers/cookiesToken";
 import retrieveUser from "@/lib/api/retrieveUser";
-
-interface NavBarProps {
-  handleCreatePostModal: () => void;
-}
+import retrieveChats from "@/lib/api/retrieveChats";
+import { useModal } from "@/context/ModalContext";
 
 interface User {
   id: string;
@@ -17,10 +15,27 @@ interface User {
   image: string;
 }
 
-export default function NavBar(props: NavBarProps) {
+interface Chat {
+  date: string;
+  id: string;
+  users: { name: string; id: string }[];
+  unreadFor: string[];
+  messages: {
+    author: string;
+    date: string;
+    delete: boolean;
+    edit: boolean;
+    id: string;
+    text: string;
+  }[];
+}
+
+export default function NavBar() {
   const [userIdProfile, setUserIdProfile] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [messagesNotReading, setMessagesNotReading] = useState<number>(0);
+
+  const { openModal } = useModal();
 
   useEffect(() => {
     const token = cookiesToken.get();
@@ -38,7 +53,21 @@ export default function NavBar(props: NavBarProps) {
     } catch (error: any) {
       alert(error.message);
     }
-  }, []);
+
+    try {
+      retrieveChats(token).then((chats) => {
+        let counter = 0;
+
+        chats.forEach((chat: Chat) => {
+          if (chat.unreadFor.includes(userId)) counter++;
+        });
+
+        setMessagesNotReading(counter);
+      });
+    } catch (error: any) {
+      alert(error.message);
+    }
+  }, [messagesNotReading]);
 
   return (
     <nav className="w-full h-16 bg-color5 fixed bottom-0 left-0 flex justify-around items-center">
@@ -54,12 +83,6 @@ export default function NavBar(props: NavBarProps) {
       >
         🌍
       </Link>
-      <button
-        onClick={props.handleCreatePostModal}
-        className="text-white text-2xl mx-2 no-underline border-b-2 border-transparent transition-transform duration-200 hover:scale-125"
-      >
-        ➕
-      </button>
       <div className="flex justify-end">
         {messagesNotReading > 0 && (
           <div className="fixed z-10 rounded-full text-sm font-bold text-white bg-red-600 w-4 h-4 text-center flex justify-center items-center mr-1">

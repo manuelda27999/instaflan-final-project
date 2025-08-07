@@ -6,6 +6,7 @@ import retrievePosts from "@/lib/api/retrievePosts";
 import Link from "next/link";
 import Post from "@/app/components/Post";
 import toggleFavPost from "@/lib/api/toggleFavPost";
+import { useModal } from "@/context/ModalContext";
 
 interface Post {
   id: string;
@@ -31,6 +32,8 @@ interface Post {
 
 export default function AllPosts() {
   const token = cookiesToken.get();
+
+  const { openModal } = useModal();
 
   const [posts, setPosts] = useState<Post[]>([]);
 
@@ -98,7 +101,7 @@ export default function AllPosts() {
   }
 
   return (
-    <section className="pt-2 pb-16">
+    <section className="pt-2">
       {posts.length === 0 && (
         <h2 className="text-gray-500 mt-6 text-center text-xl font-bold">
           You do not follow anyone,{" "}
@@ -119,6 +122,21 @@ export default function AllPosts() {
             handleToggleFavPostProps={handleToggleFavPost}
           />
         ))}
+      <div className="fixed flex justify-center items-center bottom-18 w-full z-20">
+        <button
+          onClick={() =>
+            openModal("create-post-modal", {
+              callback: (close: () => void) => {
+                updatePosts();
+                close();
+              },
+            })
+          }
+          className="bg-color2 text-white p-2 px-4 rounded-3xl font-extrabold text-lg cursor-pointer transition duration-300 hover:bg-color1"
+        >
+          New Post
+        </button>
+      </div>
     </section>
   );
 }

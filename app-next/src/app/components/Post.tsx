@@ -4,7 +4,6 @@ import { useState } from "react";
 import Link from "next/link";
 import cookiesToken from "@/lib/helpers/cookiesToken";
 import extractUserIdFromToken from "@/lib/helpers/extractUserIdFromToken";
-import toggleFavPost from "@/lib/api/toggleFavPost";
 import EditPostModal from "./modals/EditPostModal";
 import CreateCommentModal from "./modals/CreateCommentModal";
 import DeletePostModal from "./modals/DeletePostModal";

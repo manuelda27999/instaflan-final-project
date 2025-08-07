@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 import CreatePostModal from "@/app/components/modals/CreatePostModal";
 import Header from "../components/Header";
 import NavBar from "../components/NavBar";
 import cookiesToken from "@/lib/helpers/cookiesToken";
+import { useModal } from "@/context/ModalContext";
 
 export default function MainLayout({
   children,
@@ -15,7 +16,7 @@ export default function MainLayout({
 }) {
   const router = useRouter();
 
-  const [modal, setModal] = useState<string | null>(null);
+  const { modal, closeModal, modalProps } = useModal();
 
   useEffect(() => {
     const token = cookiesToken.exist();
@@ -23,26 +24,20 @@ export default function MainLayout({
     if (!token) router.push("/login");
   }, []);
 
-  const handleShowCreatePostModal = () => setModal("create-post-modal");
-
-  const handlePostCreated = () => {
-    setModal(null);
-
-    router.refresh();
-  };
-
   return (
     <div className="w-full h-full">
       <Header />
 
       <main className="pt-16 pb-16">{children}</main>
 
-      <NavBar handleCreatePostModal={handleShowCreatePostModal} />
+      <NavBar />
 
       {modal === "create-post-modal" && (
         <CreatePostModal
-          onCreatePost={handlePostCreated}
-          onHideCreatePost={() => setModal(null)}
+          onCreatePost={() => {
+            modalProps?.callback?.(closeModal);
+          }}
+          onHideCreatePost={() => closeModal()}
         />
       )}
     </div>
