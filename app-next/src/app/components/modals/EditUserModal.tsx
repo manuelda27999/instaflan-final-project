@@ -1,16 +1,23 @@
 "use client";
 
+import { useState } from "react";
 import editUser from "@/lib/api/editUser";
 import cookiesToken from "@/lib/helpers/cookiesToken";
-import { useAppContext } from "@/context/AppContextProvider";
+
+interface User {
+  name: string;
+  image: string;
+  description: string;
+}
 
 interface EditUserModalProps {
+  user: User;
   onEditUser: () => void;
   onHideEditUser: () => void;
 }
 
 export default function EditUserModal(props: EditUserModalProps) {
-  const { user, setUser } = useAppContext();
+  const [user, setUser] = useState<User | null>(props.user);
   const token = cookiesToken.get();
 
   const handleSubmitUser = (event: React.FormEvent<HTMLFormElement>) => {
@@ -59,7 +66,7 @@ export default function EditUserModal(props: EditUserModalProps) {
             className="p-2 rounded-xl border-color2 border-2"
             id="image"
             type="url"
-            defaultValue={user.photo ? user.photo : undefined}
+            defaultValue={user.image ? user.image : undefined}
           />
           <p className="m-1 text-color1 font-semibold">Description</p>
           <textarea

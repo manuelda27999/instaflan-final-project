@@ -7,7 +7,7 @@ import editPost from "@/lib/api/editPost";
 
 interface EditPostModalProps {
   postId: string;
-  onEditPost: () => void;
+  onEditPost: (post: Post) => void;
   onHideEditPost: () => void;
 }
 
@@ -45,7 +45,7 @@ export default function EditPostModal(props: EditPostModalProps) {
       try {
         editPost(token, props.postId, image, text)
           .then(() => {
-            props.onEditPost();
+            props.onEditPost({ id: props.postId, image, text });
           })
           .catch((error) => {
             alert(error.message);

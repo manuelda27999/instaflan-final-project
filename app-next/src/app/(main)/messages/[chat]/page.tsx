@@ -3,12 +3,11 @@
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 
+import { useModal } from "@/context/ModalContext";
 import cookiesToken from "@/lib/helpers/cookiesToken";
 import extractUserIdFromToken from "@/lib/helpers/extractUserIdFromToken";
 import retrieveChat from "@/lib/api/retrieveChat";
 import sendMessage from "@/lib/api/sendMessage";
-
-import EditDeleteMessageModal from "../../../components/modals/EditDeleteMessageModal";
 
 interface Chat {
   id: string;
@@ -26,14 +25,14 @@ interface Message {
 
 export default function Chat() {
   const [chat, setChat] = useState<Chat | null>(null);
-  const [message, setMessage] = useState<Message | null>(null);
-  const [modal, setModal] = useState<string | null>(null);
 
   const token = cookiesToken.get();
 
   const pathname = usePathname();
 
   const router = useRouter();
+
+  const { openModal } = useModal();
 
   const userId = extractUserIdFromToken(token);
 
@@ -105,16 +104,6 @@ export default function Chat() {
     router.back();
   };
 
-  const handleEditDeleteModal = (message: Message) => {
-    setMessage(message);
-    setModal("edit-delete-modal");
-  };
-
-  const handleHideEditDeleteModal = () => {
-    setMessage(null);
-    setModal(null);
-  };
-
   useEffect(() => {
     const pageHeight = document.body.scrollHeight;
 
@@ -170,7 +159,9 @@ export default function Chat() {
                   <p className="">{message?.text}</p>
                   {message.author === userId && (
                     <button
-                      onClick={() => handleEditDeleteModal(message)}
+                      onClick={() =>
+                        openModal("edit-delete-message", { message: message })
+                      }
                       className="ml-2 rounded-lg hover:bg-color4 hover:scale-110 "
                     >
                       ✏️
@@ -184,7 +175,9 @@ export default function Chat() {
                 <p className="">{message?.text}</p>
                 {message.author === userId && (
                   <button
-                    onClick={() => handleEditDeleteModal(message)}
+                    onClick={() =>
+                      openModal("edit-delete-message", { message: message })
+                    }
                     className="ml-2 rounded-lg hover:bg-color4 hover:scale-110 "
                   >
                     ✏️
@@ -209,13 +202,6 @@ export default function Chat() {
           Send
         </button>
       </form>
-
-      {modal === "edit-delete-modal" && message && (
-        <EditDeleteMessageModal
-          message={message}
-          onHideEditDeletePost={handleHideEditDeleteModal}
-        />
-      )}
     </section>
   );
 }

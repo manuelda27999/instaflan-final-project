@@ -8,9 +8,7 @@ import extractUserIdFromToken from "@/lib/helpers/extractUserIdFromToken";
 import retrieveUserById from "@/lib/api/retrieveUserById";
 import toggleFollowUser from "@/lib/api/toggleFollowUser";
 import createChat from "@/lib/api/createChat";
-import EditUserModal from "@/app/components/modals/EditUserModal";
-import FollowingModal from "@/app/components/modals/FollowingModal";
-import FollowedModal from "@/app/components/modals/FollowedModal";
+import { useModal } from "@/context/ModalContext";
 
 interface User {
   id: string;
@@ -34,11 +32,15 @@ export default function ProfileLayout({
   const token = cookiesToken.get();
   const userId = extractUserIdFromToken(token);
 
-  const [modal, setModal] = useState<string | null>(null);
+  const { openModal } = useModal();
 
   const [userProfile, setUserProfile] = useState<User | null>(null);
 
   useEffect(() => {
+    updateUser();
+  }, [userIdProfile]);
+
+  function updateUser() {
     try {
       retrieveUserById(token, userIdProfile)
         .then((userProfile) => {
@@ -48,45 +50,6 @@ export default function ProfileLayout({
     } catch (error: any) {
       alert(error.message);
     }
-  }, [userIdProfile]);
-
-  const handleEditUserModal = () => setModal("edit-user-modal");
-  const handleCancelModal = () => {
-    try {
-      retrieveUserById(token, userIdProfile)
-        .then((user) => {
-          setModal(null);
-          setUserProfile(user);
-        })
-        .catch((error) => {
-          alert(error.message);
-        });
-    } catch (error: any) {
-      alert(error.message);
-    }
-  };
-  const handleEditUser = () => {
-    try {
-      retrieveUserById(token, userIdProfile)
-        .then((user) => {
-          setModal(null);
-
-          setUserProfile(user);
-        })
-        .catch((error) => {
-          alert(error.message);
-        });
-    } catch (error: any) {
-      alert(error.message);
-    }
-  };
-
-  function handleProfilePosts() {
-    router.push(`/profile/${userIdProfile}/posts`);
-  }
-
-  function handleProfileFavPosts() {
-    router.push(`/profile/${userIdProfile}/fav-posts`);
   }
 
   function handleFollowUser() {
@@ -106,7 +69,7 @@ export default function ProfileLayout({
     try {
       createChat(token, userIdProfile)
         .then((chatId) => {
-          console.log(chatId);
+          chatId;
           return router.push(`/messages/${chatId}`);
         })
         .catch((error) => alert(error.message));
@@ -115,18 +78,8 @@ export default function ProfileLayout({
     }
   };
 
-  const handleFollowingModal = (event: React.MouseEvent<HTMLAnchorElement>) => {
-    event.preventDefault();
-    setModal("following-modal");
-  };
-
-  const handleFollowedModal = (event: React.MouseEvent<HTMLAnchorElement>) => {
-    event.preventDefault();
-    setModal("followed-modal");
-  };
-
   return (
-    <section className="flex flex-col items-center pb-16">
+    <section className="flex flex-col items-center">
       <div className="flex w-full justify-between items-center py-2 px-3">
         <div className="flex items-center">
           {!userProfile?.image ? (
@@ -147,22 +100,24 @@ export default function ProfileLayout({
           </h3>
         </div>
         <div className="flex gap-3">
-          <div className="flex flex-col items-center">
+          <button
+            onClick={() => openModal("followed-modal")}
+            className="flex flex-col items-center cursor-pointer"
+          >
             <p className="text-color2 font-bold">
               {userProfile?.followed ? userProfile?.followed.length : 0}
             </p>
-            <a onClick={handleFollowedModal} className="text-color2 font-bold">
-              Followed
-            </a>
-          </div>
-          <div className="flex flex-col items-center">
+            <p className="text-color2 font-bold">Followed</p>
+          </button>
+          <button
+            onClick={() => openModal("following-modal")}
+            className="flex flex-col items-center cursor-pointer"
+          >
             <p className="text-color2 font-bold">
               {userProfile?.following ? userProfile?.following.length : 0}
             </p>
-            <a onClick={handleFollowingModal} className="text-color2 font-bold">
-              Following
-            </a>
-          </div>
+            <p className="text-color2 font-bold">Following</p>
+          </button>
         </div>
       </div>
       <p className="text-color1 w-full font-semibold border-b-2 border-b-gray-400 px-3 py-2 pt-0">
@@ -170,7 +125,15 @@ export default function ProfileLayout({
       </p>
       {userId === userIdProfile ? (
         <button
-          onClick={handleEditUserModal}
+          onClick={() =>
+            openModal("edit-user-modal", {
+              user: userProfile,
+              callback: (close: () => {}) => {
+                updateUser();
+                close();
+              },
+            })
+          }
           className="button w-32 bg-color4 text-white border-none rounded-xl m-1 px-3 py-1 font-bold text-lg cursor-pointer transition duration-300 hover:bg-color3"
         >
           Edit profile
@@ -193,13 +156,13 @@ export default function ProfileLayout({
       )}
       <div className="flex w-full justify-evenly p-2 border-t-2 border-t-gray-400">
         <button
-          onClick={() => handleProfilePosts()}
+          onClick={() => router.push(`/profile/${userIdProfile}/posts`)}
           className="button bg-color4 text-white border-none rounded-xl px-3 py-1 font-bold text-lg cursor-pointer transition duration-300 hover:bg-color3"
         >
           {userId === userIdProfile ? "My posts" : "Profile posts"}
         </button>
         <button
-          onClick={() => handleProfileFavPosts()}
+          onClick={() => router.push(`/profile/${userIdProfile}/fav-posts`)}
           className="button bg-color4 text-white border-none rounded-xl px-3 py-1 font-bold text-lg cursor-pointer transition duration-300 hover:bg-color3"
         >
           {userId === userIdProfile
@@ -209,20 +172,6 @@ export default function ProfileLayout({
       </div>
 
       <main>{children}</main>
-
-      {modal === "edit-user-modal" && (
-        <EditUserModal
-          onEditUser={handleEditUser}
-          onHideEditUser={handleCancelModal}
-        />
-      )}
-
-      {modal === "following-modal" && (
-        <FollowingModal onHideFollowingModal={handleCancelModal} />
-      )}
-      {modal === "followed-modal" && (
-        <FollowedModal onHideFollowedModal={handleCancelModal} />
-      )}
     </section>
   );
 }

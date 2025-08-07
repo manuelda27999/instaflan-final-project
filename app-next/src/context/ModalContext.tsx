@@ -6,7 +6,11 @@ type ModalNames =
   | "create-post-modal"
   | "edit-post-modal"
   | "delete-post-modal"
+  | "edit-delete-message"
   | "create-comment-modal"
+  | "edit-user-modal"
+  | "following-modal"
+  | "followed-modal"
   | null;
 
 interface ModalContextType {
