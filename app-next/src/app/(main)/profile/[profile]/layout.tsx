@@ -46,9 +46,14 @@ export default function ProfileLayout({
         .then((userProfile) => {
           setUserProfile(userProfile);
         })
-        .catch((error) => alert(error.message));
-    } catch (error: any) {
-      alert(error.message);
+        .catch((error: unknown) => {
+          const message =
+            error instanceof Error ? error.message : String(error);
+          alert(message);
+        });
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      alert(message);
     }
   }
 
@@ -60,8 +65,9 @@ export default function ProfileLayout({
         })
         .then((userProfile) => setUserProfile(userProfile))
         .catch((error: any) => alert(error.message));
-    } catch (error: any) {
-      alert(error.message);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      alert(message);
     }
   }
 
@@ -72,9 +78,14 @@ export default function ProfileLayout({
           chatId;
           return router.push(`/messages/${chatId}`);
         })
-        .catch((error) => alert(error.message));
-    } catch (error: any) {
-      alert(error.message);
+        .catch((error: unknown) => {
+          const message =
+            error instanceof Error ? error.message : String(error);
+          alert(message);
+        });
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      alert(message);
     }
   };
 
@@ -126,7 +137,7 @@ export default function ProfileLayout({
       {userId === userIdProfile ? (
         <button
           onClick={() =>
-            openModal("edit-user-modal", {
+            openModal("edit-delete-message", {
               user: userProfile,
               callback: (close: () => {}) => {
                 updateUser();

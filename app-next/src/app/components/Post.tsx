@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import cookiesToken from "@/lib/helpers/cookiesToken";
 import extractUserIdFromToken from "@/lib/helpers/extractUserIdFromToken";
@@ -67,7 +68,9 @@ export default function Post(props: PostProps) {
     <article key={post.id} className="bg-color5 mb-3">
       <div className="flex justify-between items-center">
         <div className="flex justify-start items-center pl-3 py-1">
-          <img
+          <Image
+            width={48}
+            height={48}
             className="w-12 h-12 rounded-full object-cover mr-2"
             src={post.author.image}
             alt={post.author.name}

@@ -38,8 +38,9 @@ export default function EditDeleteMessageModal(
         .catch((error) => {
           alert(error.message);
         });
-    } catch (error: any) {
-      alert(error.message);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      alert(message);
     }
   };
 
@@ -52,8 +53,9 @@ export default function EditDeleteMessageModal(
         .catch((error) => {
           alert(error.message);
         });
-    } catch (error: any) {
-      alert(error.message);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      alert(message);
     }
   };
 

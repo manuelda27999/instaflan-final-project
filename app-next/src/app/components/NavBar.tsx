@@ -46,9 +46,14 @@ export default function NavBar() {
         .then((userData) => {
           setUser(userData);
         })
-        .catch((error) => alert(error.message));
-    } catch (error: any) {
-      alert(error.message);
+        .catch((error: unknown) => {
+          const message =
+            error instanceof Error ? error.message : String(error);
+          alert(message);
+        });
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      alert(message);
     }
 
     try {
@@ -61,8 +66,9 @@ export default function NavBar() {
 
         setMessagesNotReading(counter);
       });
-    } catch (error: any) {
-      alert(error.message);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      alert(message);
     }
   }, [messagesNotReading]);
 

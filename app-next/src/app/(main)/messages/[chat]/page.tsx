@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
+import Image from "next/image";
 
 import { useModal } from "@/context/ModalContext";
 import cookiesToken from "@/lib/helpers/cookiesToken";
@@ -46,9 +47,14 @@ export default function Chat() {
         .then((newChat) => {
           setChat(newChat);
         })
-        .catch((error) => alert(error.message));
-    } catch (error: any) {
-      alert(error.message);
+        .catch((error: unknown) => {
+          const message =
+            error instanceof Error ? error.message : String(error);
+          alert(message);
+        });
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      alert(message);
     }
 
     const intervalId = setInterval(() => {
@@ -57,14 +63,19 @@ export default function Chat() {
           .then((newChat) => {
             if (newChat !== chat) setChat(newChat);
           })
-          .catch((error) => alert(error.message));
-      } catch (error: any) {
-        alert(error.message);
+          .catch((error: unknown) => {
+            const message =
+              error instanceof Error ? error.message : String(error);
+            alert(message);
+          });
+      } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : String(error);
+        alert(message);
       }
     }, 2000);
 
     return () => clearInterval(intervalId);
-  }, []);
+  }, [chat, pathname, token]);
 
   const handleSendMessage = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -87,8 +98,9 @@ export default function Chat() {
         .catch((error) => {
           alert(error.message);
         });
-    } catch (error: any) {
-      alert(error.message);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      alert(message);
     }
   };
 
@@ -117,9 +129,15 @@ export default function Chat() {
     <section className="flex flex-col">
       <div className="fixed w-full bg-white flex justify-between items-center border-b-2 border-gray-400 py-1 px-2">
         <div className="flex items-center">
-          <img
+          <Image
+            width={48}
+            height={48}
             className="w-12 h-12 rounded-full object-cover"
-            src={chat?.users[0].image}
+            src={
+              chat?.users[0].image
+                ? chat?.users[0].image
+                : "app-next/public/images/default-profile.webp"
+            }
             alt="user profile image"
           />
           <a

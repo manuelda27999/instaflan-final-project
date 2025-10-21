@@ -31,8 +31,9 @@ export default function FollowingModal(props: FollowedModalProps) {
       retrieveFollowing(token, userIdProfile)
         .then((users) => setUsers(users))
         .catch((error: any) => alert(error.message));
-    } catch (error: any) {
-      alert(error.message);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      alert(message);
     }
   }, []);
 
@@ -68,9 +69,14 @@ export default function FollowingModal(props: FollowedModalProps) {
             return users2;
           });
         })
-        .catch((error) => alert(error.message));
-    } catch (error: any) {
-      alert(error.message);
+        .catch((error: unknown) => {
+          const message =
+            error instanceof Error ? error.message : String(error);
+          alert(message);
+        });
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      alert(message);
     }
   }
 

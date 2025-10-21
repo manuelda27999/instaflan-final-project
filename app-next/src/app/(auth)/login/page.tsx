@@ -23,11 +23,14 @@ export default function Login() {
 
           router.push("/home");
         })
-        .catch((error) => {
-          alert(error.message);
+        .catch((error: unknown) => {
+          const message =
+            error instanceof Error ? error.message : String(error);
+          alert(message);
         });
-    } catch (error: any) {
-      alert(error.message);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      alert(message);
     }
   };
 

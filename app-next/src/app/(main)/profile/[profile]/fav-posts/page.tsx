@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import cookiesToken from "@/lib/helpers/cookiesToken";
 import retrieveFavPosts from "@/lib/api/retrieveFavPosts";
 import toggleFavPost from "@/lib/api/toggleFavPost";
@@ -35,11 +35,16 @@ export default function ProfileFavPosts() {
         .then((posts) => {
           setPosts(posts);
         })
-        .catch((error) => alert(error.message));
-    } catch (error: any) {
-      alert(error.message);
+        .catch((error: unknown) => {
+          const message =
+            error instanceof Error ? error.message : String(error);
+          alert(message);
+        });
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      alert(message);
     }
-  }, [userIdProfile]);
+  }, [userIdProfile, token]);
 
   const updatedPosts = () => {
     try {
@@ -50,8 +55,9 @@ export default function ProfileFavPosts() {
         .catch((error) => {
           alert(error.message);
         });
-    } catch (error: any) {
-      alert(error.message);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      alert(message);
     }
   };
 
@@ -83,8 +89,9 @@ export default function ProfileFavPosts() {
         .catch((error) => {
           alert(error.message);
         });
-    } catch (error: any) {
-      alert(error.message);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      alert(message);
     }
   }
 

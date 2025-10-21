@@ -26,9 +26,14 @@ export default function FollowedModal(props: FollowedModalProps) {
     try {
       retrieveFollowed(token, userIdProfile)
         .then((users) => setUsers(users))
-        .catch((error) => alert(error.message));
-    } catch (error: any) {
-      alert(error.message);
+        .catch((error: unknown) => {
+          const message =
+            error instanceof Error ? error.message : String(error);
+          alert(message);
+        });
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      alert(message);
     }
   }, []);
 

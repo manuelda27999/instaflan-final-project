@@ -50,8 +50,9 @@ export default function UsersSearchModal() {
         searchUser(token, text)
           .then((users: User[]) => setUsers(users))
           .catch((error: any) => alert(error.message));
-      } catch (error: any) {
-        alert(error.message);
+      } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : String(error);
+        alert(message);
       }
     }, 500);
   };

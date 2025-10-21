@@ -25,8 +25,9 @@ export default function DeletePostModal(props: DeletePostModalProps) {
             alert(error.message);
             props.onHideDeletePost();
           });
-      } catch (error: any) {
-        alert(error.message);
+      } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : String(error);
+        alert(message);
       }
     }
   };

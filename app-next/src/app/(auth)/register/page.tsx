@@ -20,11 +20,14 @@ export default function Register() {
         .then(() => {
           router.push("/login");
         })
-        .catch((error) => {
-          alert(error.message);
+        .catch((error: unknown) => {
+          const message =
+            error instanceof Error ? error.message : String(error);
+          alert(message);
         });
-    } catch (error: any) {
-      alert(error.message);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      alert(message);
     }
   };
 

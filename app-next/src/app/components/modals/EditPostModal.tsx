@@ -27,9 +27,14 @@ export default function EditPostModal(props: EditPostModalProps) {
       try {
         retrievePost(token, props.postId)
           .then((post) => setPost(post))
-          .catch((error) => alert(error.message));
-      } catch (error: any) {
-        alert(error.message);
+          .catch((error: unknown) => {
+            const message =
+              error instanceof Error ? error.message : String(error);
+            alert(message);
+          });
+      } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : String(error);
+        alert(message);
       }
     }
   }, []);
@@ -50,8 +55,9 @@ export default function EditPostModal(props: EditPostModalProps) {
           .catch((error) => {
             alert(error.message);
           });
-      } catch (error: any) {
-        alert(error.message);
+      } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : String(error);
+        alert(message);
       }
     }
   };

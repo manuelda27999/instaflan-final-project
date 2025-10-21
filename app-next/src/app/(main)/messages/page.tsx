@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import cookiesToken from "@/lib/helpers/cookiesToken";
 
 import extractUserIdFromToken from "@/lib/helpers/extractUserIdFromToken";
@@ -35,11 +36,16 @@ export default function Messages() {
         .then((chats) => {
           setChats(chats);
         })
-        .catch((error) => alert(error.message));
-    } catch (error: any) {
-      alert(error.message);
+        .catch((error: unknown) => {
+          const message =
+            error instanceof Error ? error.message : String(error);
+          alert(message);
+        });
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      alert(message);
     }
-  }, []);
+  }, [token]);
 
   const handleNavigateChat = (
     event: React.MouseEvent<HTMLAnchorElement>,
@@ -71,7 +77,9 @@ export default function Messages() {
                   key={user.id}
                   className="flex justify-start items-center pl-3"
                 >
-                  <img
+                  <Image
+                    width={48}
+                    height={48}
                     className="w-12 h-12 rounded-full object-cover mr-2"
                     src={user.image}
                     alt="user profile image"

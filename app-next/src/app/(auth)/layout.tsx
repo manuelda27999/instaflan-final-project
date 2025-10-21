@@ -15,7 +15,7 @@ export default function AuthLayout({
     const token = cookiesToken.exist();
 
     if (token) router.push("/home");
-  }, []);
+  }, [router]);
 
   return (
     <main className="min-h-screen w-screen flex items-center justify-center">

@@ -35,9 +35,14 @@ export default function ProfilePosts() {
         .then((posts) => {
           setPosts(posts);
         })
-        .catch((error) => alert(error.message));
-    } catch (error: any) {
-      alert(error.message);
+        .catch((error: unknown) => {
+          const message =
+            error instanceof Error ? error.message : String(error);
+          alert(message);
+        });
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      alert(message);
     }
   }, [userIdProfile]);
 
@@ -50,8 +55,9 @@ export default function ProfilePosts() {
         .catch((error) => {
           alert(error.message);
         });
-    } catch (error: any) {
-      alert(error.message);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      alert(message);
     }
   };
 
@@ -83,8 +89,9 @@ export default function ProfilePosts() {
         .catch((error) => {
           alert(error.message);
         });
-    } catch (error: any) {
-      alert(error.message);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      alert(message);
     }
   }
 

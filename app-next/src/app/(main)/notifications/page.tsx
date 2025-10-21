@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 import cookiesToken from "@/lib/helpers/cookiesToken";
 import deleteNotification from "@/lib/api/deleteNotification";
@@ -31,11 +32,16 @@ export default function Notifications() {
     try {
       retrieveNotifications(token)
         .then((notifications) => setNotifications(notifications))
-        .catch((error) => alert(error.message));
-    } catch (error: any) {
-      alert(error.message);
+        .catch((error: unknown) => {
+          const message =
+            error instanceof Error ? error.message : String(error);
+          alert(message);
+        });
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      alert(message);
     }
-  }, []);
+  }, [token]);
 
   const handleProfile = (
     event: React.MouseEvent<HTMLAnchorElement>,
@@ -54,8 +60,9 @@ export default function Notifications() {
             .catch((error) => alert(error.messsage));
         })
         .catch((error) => alert(error.messsage));
-    } catch (error: any) {
-      alert(error.message);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      alert(message);
     }
   };
 
@@ -68,8 +75,9 @@ export default function Notifications() {
             .catch((error) => alert(error.messsage));
         })
         .catch((error) => alert(error.messsage));
-    } catch (error: any) {
-      alert(error.message);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      alert(message);
     }
   };
 
@@ -84,7 +92,9 @@ export default function Notifications() {
         <article key={notification.id} className="w-full">
           {notification.text === "Follow" && (
             <div className="flex items-center p-1 border-b-gray-400 border-b-2">
-              <img
+              <Image
+                width={48}
+                height={48}
                 className="w-12 h-12 rounded-full object-cover"
                 src={notification.user.image}
                 alt=""
@@ -105,9 +115,11 @@ export default function Notifications() {
               </button>
             </div>
           )}
-          {notification.text === "Like" && (
+          {notification.text === "Like" && notification.post && (
             <div className="flex items-center p-1 border-b-gray-400 border-b-2">
-              <img
+              <Image
+                width={48}
+                height={48}
                 className="w-12 h-12 rounded-full object-cover"
                 src={notification.user.image}
                 alt=""
@@ -121,9 +133,11 @@ export default function Notifications() {
               </a>
               <p>like your post</p>
               <div className="flex flex-col ml-4 items-center border-3">
-                <img
+                <Image
+                  width={48}
+                  height={48}
                   className="w-14 object-contain"
-                  src={notification.post?.image}
+                  src={notification.post.image}
                   alt=""
                 />
               </div>
@@ -135,9 +149,11 @@ export default function Notifications() {
               </button>
             </div>
           )}
-          {notification.text === "Comment" && (
+          {notification.text === "Comment" && notification.post && (
             <div className="flex items-center p-1 border-b-gray-400 border-b-2">
-              <img
+              <Image
+                width={48}
+                height={48}
                 className="w-12 h-12 rounded-full object-cover"
                 src={notification.user.image}
                 alt=""
@@ -151,9 +167,11 @@ export default function Notifications() {
               </a>
               <p>comment your post</p>
               <div className="flex flex-col ml-4 items-center border-3">
-                <img
+                <Image
+                  width={48}
+                  height={48}
                   className="w-14 object-contain"
-                  src={notification.post?.image}
+                  src={notification.post.image}
                   alt=""
                 />
               </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import Image from "next/image";
 import Link from "next/link";
 
 import cookiesToken from "@/lib/helpers/cookiesToken";
@@ -43,7 +43,6 @@ export default function Explorer() {
   const [users, setUsers] = useState<User[]>([]);
   const [posts, setPosts] = useState<Post[]>([]);
 
-  const router = useRouter();
   const token = cookiesToken.get();
 
   useEffect(() => {
@@ -56,11 +55,16 @@ export default function Explorer() {
           setUsers(users);
           setPosts(posts);
         })
-        .catch((error) => alert(error.message));
-    } catch (error: any) {
-      alert(error.message);
+        .catch((error: unknown) => {
+          const message =
+            error instanceof Error ? error.message : String(error);
+          alert(message);
+        });
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      alert(message);
     }
-  }, []);
+  }, [token]);
 
   function handleFollowUser(userIdProfile: string) {
     try {
@@ -76,9 +80,14 @@ export default function Explorer() {
             return users2;
           });
         })
-        .catch((error) => alert(error.message));
-    } catch (error: any) {
-      alert(error.message);
+        .catch((error: unknown) => {
+          const message =
+            error instanceof Error ? error.message : String(error);
+          alert(message);
+        });
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      alert(message);
     }
   }
 
@@ -88,9 +97,14 @@ export default function Explorer() {
         .then((users) => {
           setUsers(users);
         })
-        .catch((error) => alert(error.message));
-    } catch (error: any) {
-      alert(error.message);
+        .catch((error: unknown) => {
+          const message =
+            error instanceof Error ? error.message : String(error);
+          alert(message);
+        });
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      alert(message);
     }
   }
 
@@ -100,9 +114,14 @@ export default function Explorer() {
         .then((posts) => {
           setPosts(posts);
         })
-        .catch((error) => alert(error.message));
-    } catch (error: any) {
-      alert(error.message);
+        .catch((error: unknown) => {
+          const message =
+            error instanceof Error ? error.message : String(error);
+          alert(message);
+        });
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      alert(message);
     }
   }
 
@@ -134,8 +153,9 @@ export default function Explorer() {
         .catch((error) => {
           alert(error.message);
         });
-    } catch (error: any) {
-      alert(error.message);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      alert(message);
     }
   }
 
@@ -149,7 +169,9 @@ export default function Explorer() {
             className="flex mb-4 w-80 bg-color5 rounded-full justify-between items-center pr-5 pl-2 pt-1 pb-1"
           >
             <div className="flex items-center">
-              <img
+              <Image
+                width={48}
+                height={48}
                 className="w-12 h-12 rounded-full object-cover mr-2"
                 src={user.image}
                 alt={user.name}

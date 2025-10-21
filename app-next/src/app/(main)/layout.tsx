@@ -31,13 +31,14 @@ export default function MainLayout({
 }) {
   const router = useRouter();
 
-  const { modal, closeModal, modalProps } = useModal();
+  const { modalState, closeModal } = useModal();
+  const modal = modalState?.name ?? null;
 
   useEffect(() => {
     const token = cookiesToken.exist();
 
     if (!token) router.push("/login");
-  }, []);
+  }, [router]);
 
   return (
     <div className="w-full h-full">
@@ -47,52 +48,52 @@ export default function MainLayout({
 
       <NavBar />
 
-      {modal === "create-comment-modal" && (
+      {modalState && modalState.name === "create-comment-modal" && (
         <CreateCommentModal
-          postId={modalProps?.postId}
+          postId={modalState.props.postId}
           onCreateComment={() => {
-            modalProps?.callback?.(closeModal);
+            modalState.props.callback?.(closeModal);
           }}
           onHideCreateComment={() => closeModal()}
         />
       )}
-      {modal === "create-post-modal" && (
+      {modalState && modalState.name === "create-post-modal" && (
         <CreatePostModal
           onCreatePost={() => {
-            modalProps?.callback?.(closeModal);
+            modalState.props.callback?.(closeModal);
           }}
           onHideCreatePost={() => closeModal()}
         />
       )}
-      {modal === "delete-post-modal" && (
+      {modalState && modalState.name === "delete-post-modal" && (
         <DeletePostModal
-          postId={modalProps.postId}
+          postId={modalState.props.postId}
           onDeletePost={() => {
-            modalProps?.callback?.(closeModal);
+            modalState.props.callback?.(closeModal);
           }}
           onHideDeletePost={() => closeModal()}
         />
       )}
-      {modal === "edit-delete-message" && (
+      {modalState && modalState.name === "edit-delete-message" && (
         <EditDeleteMessageModal
-          message={modalProps.message}
+          message={modalState.props.message}
           onHideEditDeletePost={() => closeModal()}
         />
       )}
-      {modal === "edit-post-modal" && (
+      {modalState && modalState.name === "edit-post-modal" && (
         <EditPostModal
-          postId={modalProps.postId}
+          postId={modalState.props.postId}
           onEditPost={(post: Post) => {
-            modalProps?.callback?.(closeModal, post);
+            modalState.props.callback?.(closeModal, post);
           }}
           onHideEditPost={() => closeModal()}
         />
       )}
-      {modal === "edit-user-modal" && (
+      {modalState && modalState.name === "edit-user-modal" && (
         <EditUserModal
-          user={modalProps.user}
+          user={modalState.props.user}
           onEditUser={() => {
-            modalProps?.callback?.(closeModal);
+            modalState.props.callback?.(closeModal);
           }}
           onHideEditUser={() => closeModal()}
         />

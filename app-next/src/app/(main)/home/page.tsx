@@ -44,12 +44,17 @@ export default function AllPosts() {
           .then((posts) => {
             setPosts(posts);
           })
-          .catch((error) => alert(error.message));
-      } catch (error: any) {
-        alert(error.message);
+          .catch((error: unknown) => {
+            const message =
+              error instanceof Error ? error.message : String(error);
+            alert(message);
+          });
+      } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : String(error);
+        alert(message);
       }
     }
-  }, [posts.length]);
+  }, [posts.length, token]);
 
   const updatePosts = () => {
     try {
@@ -60,8 +65,9 @@ export default function AllPosts() {
         .catch((error) => {
           alert(error.message);
         });
-    } catch (error: any) {
-      alert(error.message);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      alert(message);
     }
   };
 
@@ -91,11 +97,14 @@ export default function AllPosts() {
               return posts2;
             });
           })
-          .catch((error: any) => {
-            alert(error.message);
+          .catch((error: unknown) => {
+            const message =
+              error instanceof Error ? error.message : String(error);
+            alert(message);
           });
-      } catch (error: any) {
-        alert(error.message);
+      } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : String(error);
+        alert(message);
       }
     }
   }
