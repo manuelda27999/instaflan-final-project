@@ -170,11 +170,16 @@ export default function Explorer() {
           >
             <div className="flex items-center">
               <Image
+                unoptimized
                 width={48}
                 height={48}
                 className="w-12 h-12 rounded-full object-cover mr-2"
-                src={user.image}
+                src={user.image || "/images/default-profile.webp"}
                 alt={user.name}
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.src = "/images/default-profile.webp";
+                }}
               />
               <Link
                 href={`profile/${user.id}/posts`}

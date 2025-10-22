@@ -50,6 +50,7 @@ type EditUserModalProps = {
 
 type EditDeleteMessageModalProps = {
   message: MessageSummary;
+  callback?: (close: CloseModalFn) => void;
 };
 
 type ModalState =
@@ -59,11 +60,11 @@ type ModalState =
   | { name: "edit-post-modal"; props: EditPostModalProps }
   | { name: "edit-user-modal"; props: EditUserModalProps }
   | { name: "edit-delete-message"; props: EditDeleteMessageModalProps }
-  | { name: "following-modal" }
-  | { name: "followed-modal" };
+  | { name: "following-modal"; props?: unknown }
+  | { name: "followed-modal"; props?: unknown };
 
 type ModalName = ModalState["name"];
-type ModalPropsUnion = ModalState extends { props: infer P } ? P : undefined;
+type ModalPropsUnion = ModalState extends { props: infer P } ? P : null;
 
 type OpenModal = {
   (name: "create-post-modal", props: CreatePostModalProps): void;
@@ -128,6 +129,8 @@ export const ModalProvider = ({ children }: { children: ReactNode }) => {
         });
         break;
       case "following-modal":
+        setModalState({ name });
+        break;
       case "followed-modal":
         setModalState({ name });
         break;

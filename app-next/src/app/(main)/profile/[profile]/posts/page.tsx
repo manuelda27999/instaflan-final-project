@@ -44,7 +44,7 @@ export default function ProfilePosts() {
       const message = error instanceof Error ? error.message : String(error);
       alert(message);
     }
-  }, [userIdProfile]);
+  }, [userIdProfile, token]);
 
   const updatePosts = () => {
     try {

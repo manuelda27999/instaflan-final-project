@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useRouter, usePathname } from "next/navigation";
+import Image from "next/image";
 
 import cookiesToken from "@/lib/helpers/cookiesToken";
 import extractUserIdFromToken from "@/lib/helpers/extractUserIdFromToken";
@@ -11,7 +12,6 @@ import createChat from "@/lib/api/createChat";
 import { useModal } from "@/context/ModalContext";
 
 interface User {
-  id: string;
   name: string;
   image: string;
   description: string;
@@ -36,11 +36,7 @@ export default function ProfileLayout({
 
   const [userProfile, setUserProfile] = useState<User | null>(null);
 
-  useEffect(() => {
-    updateUser();
-  }, [userIdProfile]);
-
-  function updateUser() {
+  const updateUser = useCallback(() => {
     try {
       retrieveUserById(token, userIdProfile)
         .then((userProfile) => {
@@ -55,7 +51,11 @@ export default function ProfileLayout({
       const message = error instanceof Error ? error.message : String(error);
       alert(message);
     }
-  }
+  }, [token, userIdProfile]);
+
+  useEffect(() => {
+    updateUser();
+  }, [updateUser]);
 
   function handleFollowUser() {
     try {
@@ -64,7 +64,11 @@ export default function ProfileLayout({
           return retrieveUserById(token, userIdProfile);
         })
         .then((userProfile) => setUserProfile(userProfile))
-        .catch((error: any) => alert(error.message));
+        .catch((error: unknown) => {
+          const message =
+            error instanceof Error ? error.message : String(error);
+          alert(message);
+        });
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : String(error);
       alert(message);
@@ -75,7 +79,6 @@ export default function ProfileLayout({
     try {
       createChat(token, userIdProfile)
         .then((chatId) => {
-          chatId;
           return router.push(`/messages/${chatId}`);
         })
         .catch((error: unknown) => {
@@ -93,19 +96,19 @@ export default function ProfileLayout({
     <section className="flex flex-col items-center">
       <div className="flex w-full justify-between items-center py-2 px-3">
         <div className="flex items-center">
-          {!userProfile?.image ? (
-            <img
-              className="w-12 h-12 rounded-full object-cover mr-2"
-              src={
-                "https://imgs.search.brave.com/jLOzY9Dtq7uH7I2DkMqETsipUhW25GINawy7rLyCLNY/rs:fit:860:0:0/g:ce/aHR0cHM6Ly9pbWcu/ZnJlZXBpay5jb20v/ZnJlZS1pY29uL3Vz/ZXJfMzE4LTE1OTcx/MS5qcGc_c2l6ZT02/MjYmZXh0PWpwZw"
-              }
-            />
-          ) : (
-            <img
-              className="w-12 h-12 rounded-full object-cover mr-2"
-              src={userProfile?.image}
-            />
-          )}
+          <Image
+            unoptimized
+            width={48}
+            height={48}
+            alt={"Profile image of " + userProfile?.name}
+            className="w-12 h-12 rounded-full object-cover mr-2"
+            src={
+              userProfile?.image
+                ? userProfile?.image
+                : "/images/default-profile.webp"
+            }
+          />
+
           <h3 className="font-semibold text-color1 text-xl">
             {userProfile?.name}
           </h3>
@@ -136,15 +139,16 @@ export default function ProfileLayout({
       </p>
       {userId === userIdProfile ? (
         <button
-          onClick={() =>
-            openModal("edit-delete-message", {
+          onClick={() => {
+            if (!userProfile) return;
+            openModal("edit-user-modal", {
               user: userProfile,
-              callback: (close: () => {}) => {
+              callback: (close: () => void) => {
                 updateUser();
                 close();
               },
-            })
-          }
+            });
+          }}
           className="button w-32 bg-color4 text-white border-none rounded-xl m-1 px-3 py-1 font-bold text-lg cursor-pointer transition duration-300 hover:bg-color3"
         >
           Edit profile

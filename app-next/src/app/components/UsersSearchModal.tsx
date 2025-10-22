@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import Image from "next/image";
 import cookiesToken from "@/lib/helpers/cookiesToken";
 import searchUser from "@/lib/api/searchUser";
 import Link from "next/link";
@@ -49,7 +50,11 @@ export default function UsersSearchModal() {
       try {
         searchUser(token, text)
           .then((users: User[]) => setUsers(users))
-          .catch((error: any) => alert(error.message));
+          .catch((error: unknown) => {
+            const message =
+              error instanceof Error ? error.message : String(error);
+            alert(message);
+          });
       } catch (error: unknown) {
         const message = error instanceof Error ? error.message : String(error);
         alert(message);
@@ -78,7 +83,10 @@ export default function UsersSearchModal() {
               {users?.map((user) => (
                 <article className="px-2 py-1" key={user.id}>
                   <div className="flex items-center">
-                    <img
+                    <Image
+                      unoptimized
+                      width={48}
+                      height={48}
                       className="rounded-full mr-1 w-12 h-12 object-cover"
                       src={user.image}
                       alt={user.name}

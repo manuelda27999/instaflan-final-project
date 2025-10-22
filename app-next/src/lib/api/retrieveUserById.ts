@@ -1,9 +1,18 @@
 import { validateId } from "../helpers/validators";
 
+interface User {
+  name: string;
+  image: string;
+  description: string;
+  followed?: string[];
+  following?: string[];
+  follow?: boolean;
+}
+
 export default function retrieveUserById(
   userId: string,
   userIdProfile: string
-) {
+): Promise<User> {
   validateId(userId);
 
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;

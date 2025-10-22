@@ -27,10 +27,12 @@ export default function Messages() {
   const [chats, setChats] = useState<Chat[]>([]);
   const router = useRouter();
 
-  const token = cookiesToken.get();
+  const token = typeof window !== "undefined" ? cookiesToken.get() : "";
   const userId = extractUserIdFromToken(token);
 
   useEffect(() => {
+    if (!token) return;
+
     try {
       retrieveChats(token)
         .then((chats) => {
@@ -78,11 +80,16 @@ export default function Messages() {
                   className="flex justify-start items-center pl-3"
                 >
                   <Image
+                    unoptimized
                     width={48}
                     height={48}
                     className="w-12 h-12 rounded-full object-cover mr-2"
-                    src={user.image}
+                    src={user.image || "/images/default-profile.webp"}
                     alt="user profile image"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = "/images/default-profile.webp";
+                    }}
                   />
                   <p className="m-2 text-color1 font-semibold ml-3">
                     {user.name}

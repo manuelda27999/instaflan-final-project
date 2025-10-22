@@ -93,6 +93,7 @@ export default function Notifications() {
           {notification.text === "Follow" && (
             <div className="flex items-center p-1 border-b-gray-400 border-b-2">
               <Image
+                unoptimized
                 width={48}
                 height={48}
                 className="w-12 h-12 rounded-full object-cover"
@@ -118,6 +119,7 @@ export default function Notifications() {
           {notification.text === "Like" && notification.post && (
             <div className="flex items-center p-1 border-b-gray-400 border-b-2">
               <Image
+                unoptimized
                 width={48}
                 height={48}
                 className="w-12 h-12 rounded-full object-cover"
@@ -134,6 +136,7 @@ export default function Notifications() {
               <p>like your post</p>
               <div className="flex flex-col ml-4 items-center border-3">
                 <Image
+                  unoptimized
                   width={48}
                   height={48}
                   className="w-14 object-contain"
@@ -152,6 +155,7 @@ export default function Notifications() {
           {notification.text === "Comment" && notification.post && (
             <div className="flex items-center p-1 border-b-gray-400 border-b-2">
               <Image
+                unoptimized
                 width={48}
                 height={48}
                 className="w-12 h-12 rounded-full object-cover"
@@ -168,6 +172,7 @@ export default function Notifications() {
               <p>comment your post</p>
               <div className="flex flex-col ml-4 items-center border-3">
                 <Image
+                  unoptimized
                   width={48}
                   height={48}
                   className="w-14 object-contain"

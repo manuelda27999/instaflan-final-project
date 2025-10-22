@@ -37,7 +37,7 @@ export default function EditPostModal(props: EditPostModalProps) {
         alert(message);
       }
     }
-  }, []);
+  }, [token, props.postId]);
 
   const handleSubmitPost = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();

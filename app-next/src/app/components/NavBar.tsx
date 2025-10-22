@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import Image from "next/image";
 
 import extractUserIdFromToken from "@/lib/helpers/extractUserIdFromToken";
 import cookiesToken from "@/lib/helpers/cookiesToken";
@@ -110,7 +111,10 @@ export default function NavBar() {
         href={`/profile/${userIdProfile}/posts`}
       >
         {user && (
-          <img
+          <Image
+            unoptimized
+            width={40}
+            height={40}
             className="w-10 h-10 rounded-full mr-2 object-cover mb-px hover:scale-110"
             src={
               user.image

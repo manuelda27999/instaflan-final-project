@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
+import Image from "next/image";
 import usePageTitle from "@/lib/hooks/usePageTittle";
 import cookiesToken from "@/lib/helpers/cookiesToken";
 import UsersSearchModal from "@/app/components/UsersSearchModal";
@@ -11,16 +12,17 @@ export default function Header() {
   const router = useRouter();
 
   const [page, setPage] = useState("Instaflan");
+  const pageTitle = usePageTitle(pathname);
 
   useEffect(() => {
-    setPage(usePageTitle(pathname));
-  }, [pathname]);
+    setPage(pageTitle);
+  }, [pathname, pageTitle]);
 
   useEffect(() => {
     const token = cookiesToken.exist();
 
     if (!token) router.push("/login");
-  }, []);
+  }, [router]);
 
   const handleLogout = () => {
     cookiesToken.delete();
@@ -32,7 +34,14 @@ export default function Header() {
       <div className="flex items-center">
         <h2 className="text-xl text-color1 font-semibold">{page}</h2>
         {page === "Instaflan" && (
-          <img className="w-16" src="/images/flan.png" alt="Icon flan" />
+          <Image
+            unoptimized
+            width={64}
+            height={64}
+            className="w-16"
+            src="/images/flan.png"
+            alt="Icon flan"
+          />
         )}
       </div>
       {page === "Profile" ? (

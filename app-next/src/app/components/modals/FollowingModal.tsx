@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
+import Image from "next/image";
+
 import cookiesToken from "@/lib/helpers/cookiesToken";
 import toggleFollowUser from "@/lib/api/toggleFollowUser";
 import retrieveFollowing from "@/lib/api/retrieveFollowing";
@@ -30,12 +32,16 @@ export default function FollowingModal(props: FollowedModalProps) {
     try {
       retrieveFollowing(token, userIdProfile)
         .then((users) => setUsers(users))
-        .catch((error: any) => alert(error.message));
+        .catch((error: unknown) => {
+          const message =
+            error instanceof Error ? error.message : String(error);
+          alert(message);
+        });
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : String(error);
       alert(message);
     }
-  }, []);
+  }, [token, userIdProfile]);
 
   const handleProfile = (
     event: React.MouseEvent<HTMLAnchorElement>,
@@ -94,7 +100,10 @@ export default function FollowingModal(props: FollowedModalProps) {
               <article key={user.id} className="flex w-full">
                 <div className="flex justify-between items-center w-full bg-white m-1 p-1 px-2 rounded-2xl">
                   <div className="flex flex-start items-center">
-                    <img
+                    <Image
+                      unoptimized
+                      width={48}
+                      height={48}
                       className="rounded-full mr-1 w-12 h-12 object-cover"
                       src={user.image}
                       alt={user.name}

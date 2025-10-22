@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import editUser from "@/lib/api/editUser";
 import cookiesToken from "@/lib/helpers/cookiesToken";
 
@@ -17,7 +16,7 @@ interface EditUserModalProps {
 }
 
 export default function EditUserModal(props: EditUserModalProps) {
-  const [user, setUser] = useState<User | null>(props.user);
+  const user = props.user;
   const token = cookiesToken.get();
 
   const handleSubmitUser = (event: React.FormEvent<HTMLFormElement>) => {

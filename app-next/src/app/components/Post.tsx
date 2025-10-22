@@ -56,7 +56,7 @@ export default function Post(props: PostProps) {
     image: string;
     text: string;
   }) {
-    let updatedPost = post;
+    const updatedPost = post;
 
     updatedPost.image = postParam.image;
     updatedPost.text = postParam.text;
@@ -69,11 +69,16 @@ export default function Post(props: PostProps) {
       <div className="flex justify-between items-center">
         <div className="flex justify-start items-center pl-3 py-1">
           <Image
+            unoptimized
             width={48}
             height={48}
             className="w-12 h-12 rounded-full object-cover mr-2"
-            src={post.author.image}
+            src={post.author.image || "/images/default-profile.webp"}
             alt={post.author.name}
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.src = "/images/default-profile.webp";
+            }}
           />
           <Link
             href={`/profile/${post.author.id}/posts`}
@@ -89,16 +94,34 @@ export default function Post(props: PostProps) {
           {post.fav ? "🤍" : "♡"}
         </button>
       </div>
-      <img className="w-full" src={post.image} alt={post.text} />
+      <Image
+        unoptimized
+        width={800}
+        height={600}
+        className="w-full h-auto object-cover"
+        src={post.image || "/images/image-not-available.webp"}
+        alt={post.text}
+        onError={(e) => {
+          const target = e.target as HTMLImageElement;
+          target.src = "/images/image-not-available.webp";
+        }}
+      />
       <p className="m-2 text-color1 font-semibold ml-3">🤍{post.likes}</p>
       <p className="m-2 mb-0 text-color1 font-semibold ml-3">{post.text}</p>
       {post.comments.length > 0 && (
         <div className="border-x-color5 border-x-8 bg-white p-1">
           {post?.comments.map((comment) => (
             <article className="flex items-start m-1" key={comment.id}>
-              <img
+              <Image
+                unoptimized
+                width={16}
+                height={16}
                 className="w-4 h-4 rounded-full object-cover mr-1"
-                src={comment.author.image}
+                src={
+                  comment.author.image
+                    ? comment.author.image
+                    : "/default-profile.png"
+                }
                 alt=""
               />
               <Link
@@ -134,7 +157,7 @@ export default function Post(props: PostProps) {
                 openModal("edit-post-modal", {
                   postId: post.id,
                   callback: (
-                    close: () => {},
+                    close: () => void,
                     post: { id: string; text: string; image: string }
                   ) => {
                     updateThisPost(post);
@@ -152,7 +175,7 @@ export default function Post(props: PostProps) {
               onClick={() =>
                 openModal("delete-post-modal", {
                   postId: post.id,
-                  callback: (close: () => {}) => {
+                  callback: (close: () => void) => {
                     props.updatePosts();
                     close();
                   },

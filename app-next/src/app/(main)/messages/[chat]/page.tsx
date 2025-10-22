@@ -130,15 +130,16 @@ export default function Chat() {
       <div className="fixed w-full bg-white flex justify-between items-center border-b-2 border-gray-400 py-1 px-2">
         <div className="flex items-center">
           <Image
+            unoptimized
             width={48}
             height={48}
             className="w-12 h-12 rounded-full object-cover"
-            src={
-              chat?.users[0].image
-                ? chat?.users[0].image
-                : "app-next/public/images/default-profile.webp"
-            }
+            src={chat?.users[0].image || "/images/default-profile.webp"}
             alt="user profile image"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.src = "/images/default-profile.webp";
+            }}
           />
           <a
             onClick={(event) =>
