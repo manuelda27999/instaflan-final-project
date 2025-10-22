@@ -69,7 +69,7 @@ export default function EditPostModal(props: EditPostModalProps) {
       {post && (
         <form
           onSubmit={handleSubmitPost}
-          className="flex flex-col justify-center items-center p-6 bg-color5 border-3 border-solid border-black border-4 rounded-lg w-64"
+          className="flex flex-col justify-center items-center p-6 bg-color5 border-solid border-black border-4 rounded-lg w-64"
           action=""
         >
           <h3 className="font-bold text-xl text-color1 mb-4">Edit post</h3>
