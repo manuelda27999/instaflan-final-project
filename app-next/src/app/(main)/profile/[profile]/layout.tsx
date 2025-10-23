@@ -30,6 +30,7 @@ export default function ProfileLayout({
   const userIdProfile = pathname.split("/")[2];
 
   const token = cookiesToken.get();
+  if (!token) return;
   const userId = extractUserIdFromToken(token);
 
   const { openModal } = useModal();
@@ -58,6 +59,7 @@ export default function ProfileLayout({
   }, [updateUser]);
 
   function handleFollowUser() {
+    if (!token) return;
     try {
       toggleFollowUser(token, userIdProfile)
         .then(() => {

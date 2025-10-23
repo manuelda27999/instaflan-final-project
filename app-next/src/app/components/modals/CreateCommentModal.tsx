@@ -37,10 +37,10 @@ export default function CreateCommentModal(props: CreateCommentModalProps) {
   const handleCancelCreateComment = () => props.onHideCreateComment();
 
   return (
-    <div className="fixed z-30 top-0 left-0 right-0 bottom-0 m-auto bg-black/50 w-full h-full z-2 flex flex-col items-center justify-center">
+    <div className="fixed z-30 top-0 left-0 right-0 bottom-0 m-auto bg-black/50 w-full h-full flex flex-col items-center justify-center">
       <form
         onSubmit={handleSubmitComment}
-        className="flex flex-col justify-center items-center p-6 bg-color5 border-3 border-solid border-black border-4 rounded-lg w-64"
+        className="flex flex-col justify-center items-center p-6 bg-color5 border-solid border-black border-4 rounded-lg w-64"
         action=""
       >
         <h3 className="font-bold text-xl text-color1 mb-4">Comment post</h3>

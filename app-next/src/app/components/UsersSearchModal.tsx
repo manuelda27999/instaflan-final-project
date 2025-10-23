@@ -48,6 +48,7 @@ export default function UsersSearchModal() {
       }
 
       try {
+        if (!token) return;
         searchUser(token, text)
           .then((users: User[]) => setUsers(users))
           .catch((error: unknown) => {

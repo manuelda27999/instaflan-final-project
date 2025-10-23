@@ -1,9 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
-
-import cookiesToken from "@/lib/helpers/cookiesToken";
 import { useModal } from "@/context/ModalContext";
 
 import Header from "../components/Header";
@@ -17,6 +13,7 @@ import EditUserModal from "../components/modals/EditUserModal";
 import FollowedModal from "../components/modals/FollowedModal";
 import FollowingModal from "../components/modals/FollowingModal";
 import EditDeleteMessageModal from "../components/modals/EditDeleteMessageModal";
+import ErrorModal from "../components/modals/ErrorModal";
 
 interface Post {
   id: string;
@@ -29,16 +26,7 @@ export default function MainLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const router = useRouter();
-
   const { modalState, closeModal } = useModal();
-  const modal = modalState?.name ?? null;
-
-  useEffect(() => {
-    const token = cookiesToken.exist();
-
-    if (!token) router.push("/login");
-  }, [router]);
 
   return (
     <div className="w-full h-full">
@@ -98,11 +86,17 @@ export default function MainLayout({
           onHideEditUser={() => closeModal()}
         />
       )}
-      {modal === "followed-modal" && (
+      {modalState && modalState.name === "followed-modal" && (
         <FollowedModal onHideFollowedModal={() => closeModal()} />
       )}
-      {modal === "following-modal" && (
+      {modalState && modalState.name === "following-modal" && (
         <FollowingModal onHideFollowingModal={() => closeModal()} />
+      )}
+      {modalState && modalState.name === "error-modal" && (
+        <ErrorModal
+          message={modalState.props.message}
+          onClose={() => closeModal()}
+        />
       )}
     </div>
   );

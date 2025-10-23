@@ -38,6 +38,7 @@ export default function NavBar() {
   useEffect(() => {
     const token = cookiesToken.get();
 
+    if (!token) return;
     const userId = extractUserIdFromToken(token);
 
     setUserIdProfile(userId);

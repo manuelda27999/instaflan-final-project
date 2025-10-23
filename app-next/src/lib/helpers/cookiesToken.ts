@@ -12,12 +12,12 @@ const cookiesToken = {
    * @returns {string} The token value.
    * @throws {Error} If the token is not found in cookies.
    */
-  get(): string {
+  get(): string | undefined {
     if (typeof document === "undefined") return "";
 
     const match = document.cookie.match(new RegExp("(^| )token=([^;]+)"));
 
-    if (!match) throw new Error("Token not found in cookies");
+    if (!match) return;
 
     return match[2];
   },

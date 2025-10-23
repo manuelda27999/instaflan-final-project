@@ -28,6 +28,7 @@ export default function Messages() {
   const router = useRouter();
 
   const token = typeof window !== "undefined" ? cookiesToken.get() : "";
+  if (!token) return;
   const userId = extractUserIdFromToken(token);
 
   useEffect(() => {

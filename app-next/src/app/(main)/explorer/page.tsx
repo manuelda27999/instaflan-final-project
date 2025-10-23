@@ -46,6 +46,8 @@ export default function Explorer() {
   const token = cookiesToken.get();
 
   useEffect(() => {
+    if (!token) return;
+
     try {
       Promise.all([
         retrieveUsersNotFollowed(token),
@@ -67,6 +69,8 @@ export default function Explorer() {
   }, [token]);
 
   function handleFollowUser(userIdProfile: string) {
+    if (!token) return;
+
     try {
       toggleFollowUser(token, userIdProfile)
         .then(() => {
@@ -92,6 +96,8 @@ export default function Explorer() {
   }
 
   function handleUpdateUsers() {
+    if (!token) return;
+
     try {
       retrieveUsersNotFollowed(token)
         .then((users) => {
@@ -109,6 +115,8 @@ export default function Explorer() {
   }
 
   function handleUpdatePosts() {
+    if (!token) return;
+
     try {
       retrievePostsNotFollowed(token)
         .then((posts) => {
@@ -126,6 +134,8 @@ export default function Explorer() {
   }
 
   function handletoggleFavPost(postId: string) {
+    if (!token) return;
+
     try {
       toggleFavPost(token, postId)
         .then(() => {

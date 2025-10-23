@@ -24,6 +24,7 @@ interface Post {
 
 export default function ProfileFavPosts() {
   const token = cookiesToken.get();
+  if (!token) return;
   const pathname = usePathname();
   const userIdProfile = pathname.split("/")[2];
 
@@ -62,6 +63,7 @@ export default function ProfileFavPosts() {
   };
 
   function handletoggleFavPost(postId: string) {
+    if (!token) return;
     try {
       toggleFavPost(token, postId)
         .then(() => {

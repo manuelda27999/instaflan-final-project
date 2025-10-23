@@ -57,6 +57,7 @@ export default function AllPosts() {
   }, [posts.length, token]);
 
   const updatePosts = () => {
+    if (!token) return;
     try {
       retrievePosts(token)
         .then((posts) => {

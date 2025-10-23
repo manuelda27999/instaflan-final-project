@@ -24,6 +24,8 @@ interface Notification {
 
 export default function Notifications() {
   const token = cookiesToken.get();
+  if (!token) return;
+
   const [notifications, setNotifications] = useState<Notification[]>([]);
 
   const router = useRouter();

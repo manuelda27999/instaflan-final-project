@@ -1,9 +1,14 @@
+import { redirect } from "next/navigation";
+import { createSession } from "../helpers/session";
 import { validateEmail, validatePassword } from "../helpers/validators";
 
 export default function authenticateUser(
-  email: string,
-  password: string
-): Promise<string> {
+  prevState: any,
+  formData: FormData
+): Promise<void> {
+  const email = formData.get("email") as string;
+  const password = formData.get("password") as string;
+
   validateEmail(email);
   validatePassword(password);
 
@@ -22,7 +27,9 @@ export default function authenticateUser(
       return res.json().then((body) => {
         const userId = body;
 
-        return userId;
+        createSession(userId);
+
+        return;
       });
     } else if (res.status === 400) {
       return res.json().then((body) => {

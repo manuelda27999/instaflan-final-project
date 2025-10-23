@@ -35,6 +35,7 @@ export default function Chat() {
 
   const { openModal } = useModal();
 
+  if (!token) return;
   const userId = extractUserIdFromToken(token);
 
   useEffect(() => {

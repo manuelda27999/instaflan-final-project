@@ -53,6 +53,11 @@ type EditDeleteMessageModalProps = {
   callback?: (close: CloseModalFn) => void;
 };
 
+type ErrorModalProps = {
+  message: string;
+  callback?: (close: CloseModalFn) => void;
+};
+
 type ModalState =
   | { name: "create-post-modal"; props: CreatePostModalProps }
   | { name: "create-comment-modal"; props: CreateCommentModalProps }
@@ -61,7 +66,8 @@ type ModalState =
   | { name: "edit-user-modal"; props: EditUserModalProps }
   | { name: "edit-delete-message"; props: EditDeleteMessageModalProps }
   | { name: "following-modal"; props?: unknown }
-  | { name: "followed-modal"; props?: unknown };
+  | { name: "followed-modal"; props?: unknown }
+  | { name: "error-modal"; props: ErrorModalProps };
 
 type ModalName = ModalState["name"];
 type ModalPropsUnion = ModalState extends { props: infer P } ? P : null;
@@ -75,6 +81,7 @@ type OpenModal = {
   (name: "edit-delete-message", props: EditDeleteMessageModalProps): void;
   (name: "following-modal"): void;
   (name: "followed-modal"): void;
+  (name: "error-modal", props: ErrorModalProps): void;
 };
 
 interface ModalContextType {
@@ -133,6 +140,12 @@ export const ModalProvider = ({ children }: { children: ReactNode }) => {
         break;
       case "followed-modal":
         setModalState({ name });
+        break;
+      case "error-modal":
+        setModalState({
+          name,
+          props: props as ErrorModalProps,
+        });
         break;
       default:
         break;
