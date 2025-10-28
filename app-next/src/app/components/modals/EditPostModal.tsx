@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import cookiesToken from "@/lib/helpers/cookiesToken";
+import { useState, useEffect, useTransition } from "react";
 import retrievePost from "@/lib/api/retrievePost";
 import editPost from "@/lib/api/editPost";
 
@@ -19,25 +18,16 @@ interface Post {
 
 export default function EditPostModal(props: EditPostModalProps) {
   const [post, setPost] = useState<Post | null>(null);
-
-  const token = cookiesToken.get();
+  const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
-    if (token) {
-      try {
-        retrievePost(token, props.postId)
-          .then((post) => setPost(post))
-          .catch((error: unknown) => {
-            const message =
-              error instanceof Error ? error.message : String(error);
-            alert(message);
-          });
-      } catch (error: unknown) {
+    retrievePost(props.postId)
+      .then((post) => setPost(post))
+      .catch((error: unknown) => {
         const message = error instanceof Error ? error.message : String(error);
         alert(message);
-      }
-    }
-  }, [token, props.postId]);
+      });
+  }, [props.postId]);
 
   const handleSubmitPost = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -46,20 +36,17 @@ export default function EditPostModal(props: EditPostModalProps) {
     const image = (form.elements.namedItem("image") as HTMLInputElement).value;
     const text = (form.elements.namedItem("text") as HTMLInputElement).value;
 
-    if (token) {
-      try {
-        editPost(token, props.postId, image, text)
-          .then(() => {
-            props.onEditPost({ id: props.postId, image, text });
-          })
-          .catch((error) => {
-            alert(error.message);
-          });
-      } catch (error: unknown) {
-        const message = error instanceof Error ? error.message : String(error);
-        alert(message);
-      }
-    }
+    startTransition(() => {
+      editPost(props.postId, image, text)
+        .then(() => {
+          props.onEditPost({ id: props.postId, image, text });
+        })
+        .catch((error: unknown) => {
+          const message =
+            error instanceof Error ? error.message : String(error);
+          alert(message);
+        });
+    });
   };
 
   const handleCancelEditPost = () => props.onHideEditPost();
@@ -92,9 +79,10 @@ export default function EditPostModal(props: EditPostModalProps) {
           <div className="flex justify-around mt-5 w-full">
             <button
               type="submit"
+              disabled={isPending}
               className="bg-color4 text-white border-none rounded-xl px-3 py-1 font-bold text-lg cursor-pointer transition duration-300 hover:bg-color3"
             >
-              Edit
+              {isPending ? "Saving..." : "Edit"}
             </button>
             <button
               onClick={handleCancelEditPost}

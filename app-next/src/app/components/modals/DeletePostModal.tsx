@@ -1,7 +1,7 @@
 "use client";
 
+import { useTransition } from "react";
 import deletePost from "@/lib/api/deletePost";
-import cookiesToken from "@/lib/helpers/cookiesToken";
 
 interface DeletePostModalProps {
   postId: string;
@@ -10,26 +10,23 @@ interface DeletePostModalProps {
 }
 
 export default function DeletePostModal(props: DeletePostModalProps) {
+  const [isPending, startTransition] = useTransition();
+
   const handleSubmitPost = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    const token = cookiesToken.get();
-
-    if (token) {
-      try {
-        deletePost(token, props.postId)
-          .then(() => {
-            props.onDeletePost();
-          })
-          .catch((error) => {
-            alert(error.message);
-            props.onHideDeletePost();
-          });
-      } catch (error: unknown) {
-        const message = error instanceof Error ? error.message : String(error);
-        alert(message);
-      }
-    }
+    startTransition(() => {
+      deletePost(props.postId)
+        .then(() => {
+          props.onDeletePost();
+        })
+        .catch((error: unknown) => {
+          const message =
+            error instanceof Error ? error.message : String(error);
+          alert(message);
+          props.onHideDeletePost();
+        });
+    });
   };
 
   const handleCancelDeletePost = () => props.onHideDeletePost();
@@ -48,9 +45,10 @@ export default function DeletePostModal(props: DeletePostModalProps) {
         <div className="flex justify-around mt-5 w-full">
           <button
             type="submit"
+            disabled={isPending}
             className="bg-color4 text-white border-none rounded-xl px-3 py-1 font-bold text-lg cursor-pointer transition duration-300 hover:bg-color3"
           >
-            Delete
+            {isPending ? "Deleting..." : "Delete"}
           </button>
           <button
             onClick={handleCancelDeletePost}

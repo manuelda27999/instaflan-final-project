@@ -1,31 +1,15 @@
+"use server";
+
+import { apiFetch } from "./utils";
 import { validateId } from "../helpers/validators";
 
-export default function retrievePostsOfUser(
-  userId: string,
-  userIdProfile: string
-) {
-  validateId(userId);
+export default async function retrievePostsOfUser(userIdProfile: string) {
   validateId(userIdProfile);
 
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-
-  if (!apiUrl) {
-    throw new Error("API URL is not defined in environment variables.");
-  }
-
-  return fetch(`${apiUrl}/users/${userIdProfile}/posts`, {
-    headers: { Authorization: `Bearer ${userId}` },
-  }).then((res) => {
-    if (res.status === 200) {
-      return res.json().then((posts) => posts);
-    } else if (res.status === 400) {
-      return res.json().then((err) => {
-        throw new Error(err.error);
-      });
-    } else {
-      throw new Error(
-        `An unexpected error occurred while retrieving posts. Status code: ${res.status}`
-      );
-    }
+  const response = await apiFetch(`/users/${userIdProfile}/posts`, {
+    method: "GET",
+    errorMessage: "Unexpected error while retrieving user posts",
   });
+
+  return response.json();
 }

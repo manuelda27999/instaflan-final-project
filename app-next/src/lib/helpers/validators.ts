@@ -59,6 +59,11 @@ export function validateId(id: string) {
   if (id === "") throw new Error("id is empty");
 }
 
+export function validateToken(token: string) {
+  if (typeof token !== "string") throw new Error("token is not a string");
+  if (token === "") throw new Error("token is empty");
+}
+
 export function validateImage(url: string) {
   if (typeof url !== "string") throw new Error("url is not a string");
   if (url === "") throw new Error("url is empty");

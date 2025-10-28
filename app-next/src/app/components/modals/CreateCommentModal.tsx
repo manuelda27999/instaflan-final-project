@@ -1,7 +1,7 @@
 "use client";
 
+import { useTransition } from "react";
 import createComment from "@/lib/api/createComment";
-import cookiesToken from "@/lib/helpers/cookiesToken";
 
 interface CreateCommentModalProps {
   postId: string;
@@ -10,28 +10,25 @@ interface CreateCommentModalProps {
 }
 
 export default function CreateCommentModal(props: CreateCommentModalProps) {
+  const [isPending, startTransition] = useTransition();
+
   const handleSubmitComment = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     const form = event.target as HTMLFormElement;
     const text = (form.elements.namedItem("text") as HTMLInputElement).value;
 
-    const token = cookiesToken.get();
-
-    if (token) {
-      try {
-        createComment(token, props.postId, text)
-          .then(() => {
-            props.onCreateComment();
-          })
-          .catch((error) => {
-            alert(error.message);
-          });
-      } catch (error: unknown) {
-        const message = error instanceof Error ? error.message : String(error);
-        alert(message);
-      }
-    }
+    startTransition(() => {
+      createComment(props.postId, text)
+        .then(() => {
+          props.onCreateComment();
+        })
+        .catch((error: unknown) => {
+          const message =
+            error instanceof Error ? error.message : String(error);
+          alert(message);
+        });
+    });
   };
 
   const handleCancelCreateComment = () => props.onHideCreateComment();
@@ -55,9 +52,10 @@ export default function CreateCommentModal(props: CreateCommentModalProps) {
         <div className="flex justify-around mt-5 w-full">
           <button
             type="submit"
+            disabled={isPending}
             className="bg-color4 text-white border-none rounded-xl px-3 py-1 font-bold text-lg cursor-pointer transition duration-300 hover:bg-color3"
           >
-            Create
+            {isPending ? "Creating..." : "Create"}
           </button>
           <button
             onClick={handleCancelCreateComment}

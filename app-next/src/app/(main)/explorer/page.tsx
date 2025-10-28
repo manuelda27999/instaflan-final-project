@@ -1,10 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useTransition } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
-import cookiesToken from "@/lib/helpers/cookiesToken";
 import retrieveUsersNotFollowed from "@/lib/api/retrieveUsersNotFollowed";
 import retrievePostsNotFollowed from "@/lib/api/retrievePostsNotFollowed";
 import toggleFollowUser from "@/lib/api/toggleFollowUser";
@@ -42,64 +41,38 @@ interface Post {
 export default function Explorer() {
   const [users, setUsers] = useState<User[]>([]);
   const [posts, setPosts] = useState<Post[]>([]);
-
-  const token = cookiesToken.get();
+  const [isPending, startTransition] = useTransition();
+  const [isUpdatingPosts, startPostsTransition] = useTransition();
 
   useEffect(() => {
-    if (!token) return;
-
-    try {
-      Promise.all([
-        retrieveUsersNotFollowed(token),
-        retrievePostsNotFollowed(token),
-      ])
-        .then(([users, posts]) => {
-          setUsers(users);
-          setPosts(posts);
-        })
-        .catch((error: unknown) => {
-          const message =
-            error instanceof Error ? error.message : String(error);
-          alert(message);
-        });
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : String(error);
-      alert(message);
-    }
-  }, [token]);
+    Promise.all([retrieveUsersNotFollowed(), retrievePostsNotFollowed()])
+      .then(([users, posts]) => {
+        setUsers(users);
+        setPosts(posts);
+      })
+      .catch((error: unknown) => {
+        const message = error instanceof Error ? error.message : String(error);
+        alert(message);
+      });
+  }, []);
 
   function handleFollowUser(userIdProfile: string) {
-    if (!token) return;
-
-    try {
-      toggleFollowUser(token, userIdProfile)
+    startTransition(() => {
+      toggleFollowUser(userIdProfile)
         .then(() => {
-          setUsers((users) => {
-            const users2 = [...users];
-
-            const index = users2.findIndex((user) => user.id === userIdProfile);
-
-            users2.splice(index, 1);
-
-            return users2;
-          });
+          setUsers((users) => users.filter((user) => user.id !== userIdProfile));
         })
         .catch((error: unknown) => {
           const message =
             error instanceof Error ? error.message : String(error);
           alert(message);
         });
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : String(error);
-      alert(message);
-    }
+    });
   }
 
   function handleUpdateUsers() {
-    if (!token) return;
-
-    try {
-      retrieveUsersNotFollowed(token)
+    startTransition(() => {
+      retrieveUsersNotFollowed()
         .then((users) => {
           setUsers(users);
         })
@@ -108,17 +81,12 @@ export default function Explorer() {
             error instanceof Error ? error.message : String(error);
           alert(message);
         });
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : String(error);
-      alert(message);
-    }
+    });
   }
 
   function handleUpdatePosts() {
-    if (!token) return;
-
-    try {
-      retrievePostsNotFollowed(token)
+    startPostsTransition(() => {
+      retrievePostsNotFollowed()
         .then((posts) => {
           setPosts(posts);
         })
@@ -127,22 +95,19 @@ export default function Explorer() {
             error instanceof Error ? error.message : String(error);
           alert(message);
         });
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : String(error);
-      alert(message);
-    }
+    });
   }
 
   function handletoggleFavPost(postId: string) {
-    if (!token) return;
-
-    try {
-      toggleFavPost(token, postId)
+    startPostsTransition(() => {
+      toggleFavPost(postId)
         .then(() => {
           setPosts((posts) => {
             const posts2 = [...posts];
 
             const index = posts2.findIndex((post) => post.id === postId);
+            if (index === -1) return posts;
+
             const post = posts2[index];
 
             const post2 = { ...post };
@@ -160,13 +125,12 @@ export default function Explorer() {
             return posts2;
           });
         })
-        .catch((error) => {
-          alert(error.message);
+        .catch((error: unknown) => {
+          const message =
+            error instanceof Error ? error.message : String(error);
+          alert(message);
         });
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : String(error);
-      alert(message);
-    }
+    });
   }
 
   return (
@@ -200,9 +164,10 @@ export default function Explorer() {
             </div>
             <button
               onClick={() => handleFollowUser(user.id)}
+              disabled={isPending}
               className="button bg-color4 text-white border-none rounded-xl px-3 py-1 font-bold text-lg cursor-pointer transition duration-300 hover:bg-color3 edit-profile-button"
             >
-              Follow
+              {isPending ? "Following..." : "Follow"}
             </button>
           </article>
         ))}
@@ -227,9 +192,10 @@ export default function Explorer() {
         ))}
         <button
           onClick={handleUpdatePosts}
+          disabled={isUpdatingPosts}
           className="bg-color4 text-white border-none rounded-xl px-3 py-1 font-bold text-lg cursor-pointer transition duration-300 hover:bg-color3"
         >
-          Update posts
+          {isUpdatingPosts ? "Updating…" : "Update posts"}
         </button>
       </article>
     </section>

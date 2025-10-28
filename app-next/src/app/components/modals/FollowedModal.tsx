@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import retrieveFollowed from "@/lib/api/retrieveFollowed";
 import { useRouter, usePathname } from "next/navigation";
-import cookiesToken from "@/lib/helpers/cookiesToken";
 
 interface FollowedModalProps {
   onHideFollowedModal: () => void;
@@ -16,7 +15,6 @@ interface User {
 }
 
 export default function FollowedModal(props: FollowedModalProps) {
-  const token = cookiesToken.get();
   const [users, setUsers] = useState<User[]>([]);
   const router = useRouter();
 
@@ -24,19 +22,13 @@ export default function FollowedModal(props: FollowedModalProps) {
   const userIdProfile = pathname.split("/")[2];
 
   useEffect(() => {
-    try {
-      retrieveFollowed(token, userIdProfile)
-        .then((users) => setUsers(users))
-        .catch((error: unknown) => {
-          const message =
-            error instanceof Error ? error.message : String(error);
-          alert(message);
-        });
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : String(error);
-      alert(message);
-    }
-  }, [token, userIdProfile]);
+    retrieveFollowed(userIdProfile)
+      .then((users) => setUsers(users))
+      .catch((error: unknown) => {
+        const message = error instanceof Error ? error.message : String(error);
+        alert(message);
+      });
+  }, [userIdProfile]);
 
   const handleProfile = (
     event: React.MouseEvent<HTMLAnchorElement>,

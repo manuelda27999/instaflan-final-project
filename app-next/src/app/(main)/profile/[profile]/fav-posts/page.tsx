@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { usePathname } from "next/navigation";
-import cookiesToken from "@/lib/helpers/cookiesToken";
 import retrieveFavPosts from "@/lib/api/retrieveFavPosts";
 import toggleFavPost from "@/lib/api/toggleFavPost";
 
@@ -23,54 +22,43 @@ interface Post {
 }
 
 export default function ProfileFavPosts() {
-  const token = cookiesToken.get();
-  if (!token) return;
   const pathname = usePathname();
   const userIdProfile = pathname.split("/")[2];
 
   const [posts, setPosts] = useState<Post[]>([]);
+  const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
-    try {
-      retrieveFavPosts(token, userIdProfile)
-        .then((posts) => {
-          setPosts(posts);
-        })
-        .catch((error: unknown) => {
-          const message =
-            error instanceof Error ? error.message : String(error);
-          alert(message);
-        });
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : String(error);
-      alert(message);
-    }
-  }, [userIdProfile, token]);
+    retrieveFavPosts(userIdProfile)
+      .then((posts) => {
+        setPosts(posts);
+      })
+      .catch((error: unknown) => {
+        const message = error instanceof Error ? error.message : String(error);
+        alert(message);
+      });
+  }, [userIdProfile]);
 
   const updatedPosts = () => {
-    try {
-      retrieveFavPosts(token, userIdProfile)
-        .then((posts) => {
-          setPosts(posts);
-        })
-        .catch((error) => {
-          alert(error.message);
-        });
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : String(error);
-      alert(message);
-    }
+    retrieveFavPosts(userIdProfile)
+      .then((posts) => {
+        setPosts(posts);
+      })
+      .catch((error) => {
+        alert(error instanceof Error ? error.message : String(error));
+      });
   };
 
   function handletoggleFavPost(postId: string) {
-    if (!token) return;
-    try {
-      toggleFavPost(token, postId)
+    startTransition(() => {
+      toggleFavPost(postId)
         .then(() => {
           setPosts((posts) => {
             const posts2 = [...posts];
 
             const index = posts2.findIndex((post) => post.id === postId);
+            if (index === -1) return posts;
+
             const post = posts2[index];
 
             const post2 = { ...post };
@@ -88,13 +76,12 @@ export default function ProfileFavPosts() {
             return posts2;
           });
         })
-        .catch((error) => {
-          alert(error.message);
+        .catch((error: unknown) => {
+          const message =
+            error instanceof Error ? error.message : String(error);
+          alert(message);
         });
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : String(error);
-      alert(message);
-    }
+    });
   }
 
   return (
@@ -107,6 +94,9 @@ export default function ProfileFavPosts() {
           handleToggleFavPostProps={handletoggleFavPost}
         />
       ))}
+      {isPending && posts.length === 0 && (
+        <p className="text-center text-slate-500 mt-4">Loading favorite posts…</p>
+      )}
     </section>
   );
 }

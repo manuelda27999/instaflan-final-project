@@ -4,8 +4,6 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 
-import extractUserIdFromToken from "@/lib/helpers/extractUserIdFromToken";
-import cookiesToken from "@/lib/helpers/cookiesToken";
 import retrieveUser from "@/lib/api/retrieveUser";
 import retrieveChats from "@/lib/api/retrieveChats";
 
@@ -15,64 +13,53 @@ interface User {
   image: string;
 }
 
-interface Chat {
-  date: string;
-  id: string;
-  users: { name: string; id: string }[];
-  unreadFor: string[];
-  messages: {
-    author: string;
-    date: string;
-    delete: boolean;
-    edit: boolean;
-    id: string;
-    text: string;
-  }[];
-}
-
 export default function NavBar() {
   const [userIdProfile, setUserIdProfile] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [messagesNotReading, setMessagesNotReading] = useState<number>(0);
 
   useEffect(() => {
-    const token = cookiesToken.get();
+    let active = true;
+    let currentUserId: string | null = null;
 
-    if (!token) return;
-    const userId = extractUserIdFromToken(token);
+    const fetchChats = (userId: string | null) => {
+      retrieveChats()
+        .then((chats) => {
+          if (!active) return;
 
-    setUserIdProfile(userId);
+          const counter = chats.reduce((total, chat) => {
+            if (!userId) return total;
+            return chat.unreadFor.includes(userId) ? total + 1 : total;
+          }, 0);
 
-    try {
-      retrieveUser(token)
-        .then((userData) => {
-          setUser(userData);
+          setMessagesNotReading(counter);
         })
         .catch((error: unknown) => {
-          const message =
-            error instanceof Error ? error.message : String(error);
+          const message = error instanceof Error ? error.message : String(error);
           alert(message);
         });
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : String(error);
-      alert(message);
-    }
+    };
 
-    try {
-      retrieveChats(token).then((chats) => {
-        let counter = 0;
-
-        chats.forEach((chat: Chat) => {
-          if (chat.unreadFor.includes(userId)) counter++;
-        });
-
-        setMessagesNotReading(counter);
+    retrieveUser()
+      .then((userData) => {
+        if (!active) return;
+        setUser(userData);
+        currentUserId = userData?.id ?? null;
+        setUserIdProfile(currentUserId);
+        fetchChats(currentUserId);
+      })
+      .catch((error: unknown) => {
+        const message = error instanceof Error ? error.message : String(error);
+        alert(message);
       });
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : String(error);
-      alert(message);
-    }
-  }, [messagesNotReading]);
+
+    const interval = setInterval(() => fetchChats(currentUserId), 5000);
+
+    return () => {
+      active = false;
+      clearInterval(interval);
+    };
+  }, []);
 
   return (
     <nav className="w-full h-16 bg-color5 fixed z-10 bottom-0 left-0 flex justify-around items-center">

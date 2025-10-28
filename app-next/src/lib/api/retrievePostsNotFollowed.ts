@@ -1,27 +1,12 @@
-import { validateId } from "../helpers/validators";
+"use server";
 
-export default function retrievePostsNotFollowed(userId: string) {
-  validateId(userId);
+import { apiFetch } from "./utils";
 
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-
-  if (!apiUrl) {
-    throw new Error("API URL is not defined in environment variables.");
-  }
-
-  return fetch(`${apiUrl}/explorer/posts`, {
-    headers: {
-      Authorization: `Bearer ${userId}`,
-    },
-  }).then((res) => {
-    if (res.status === 200) {
-      return res.json();
-    } else if (res.status === 400) {
-      return res.json().then((body) => {
-        throw new Error(body.error);
-      });
-    } else {
-      throw new Error(`Unexpected response status: ${res.status}`);
-    }
+export default async function retrievePostsNotFollowed() {
+  const response = await apiFetch("/explorer/posts", {
+    method: "GET",
+    errorMessage: "Unexpected error while retrieving explorer posts",
   });
+
+  return response.json();
 }

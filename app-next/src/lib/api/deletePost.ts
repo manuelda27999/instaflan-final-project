@@ -1,29 +1,13 @@
+"use server";
+
+import { apiFetch } from "./utils";
 import { validateId } from "../helpers/validators";
 
-export default function deletePost(userId: string, postId: string) {
-  validateId(userId);
+export default async function deletePost(postId: string): Promise<void> {
   validateId(postId);
 
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-
-  if (!apiUrl) {
-    throw new Error("API URL is not defined in environment variables.");
-  }
-
-  return fetch(`${apiUrl}/posts/${postId}`, {
+  await apiFetch(`/posts/${postId}`, {
     method: "DELETE",
-    headers: {
-      Authorization: `Bearer ${userId}`,
-    },
-  }).then((res) => {
-    if (res.status === 200) {
-      return;
-    } else if (res.status === 400) {
-      res.json().then((body) => {
-        throw new Error(body.error);
-      });
-    } else {
-      throw new Error(`Unexpected status code: ${res.status}`);
-    }
+    errorMessage: "Unexpected error while deleting the post",
   });
 }

@@ -1,7 +1,7 @@
 "use client";
 
+import { useTransition } from "react";
 import createNewPost from "@/lib/api/createNewPost";
-import cookiesToken from "@/lib/helpers/cookiesToken";
 
 interface CreatePostModalProps {
   onCreatePost: () => void;
@@ -9,6 +9,8 @@ interface CreatePostModalProps {
 }
 
 export default function CreatePostModal(props: CreatePostModalProps) {
+  const [isPending, startTransition] = useTransition();
+
   const handleSubmitPost = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -16,20 +18,17 @@ export default function CreatePostModal(props: CreatePostModalProps) {
     const image = (form.elements.namedItem("image") as HTMLInputElement).value;
     const text = (form.elements.namedItem("text") as HTMLInputElement).value;
 
-    try {
-      const token = cookiesToken.get();
-
-      createNewPost(token, image, text)
+    startTransition(() => {
+      createNewPost(image, text)
         .then(() => {
           props.onCreatePost();
         })
-        .catch((error) => {
-          alert(error.message);
+        .catch((error: unknown) => {
+          const message =
+            error instanceof Error ? error.message : String(error);
+          alert(message);
         });
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : String(error);
-      alert(message);
-    }
+    });
   };
 
   const handleCancelCreatePost = () => props.onHideCreatePost();
@@ -59,9 +58,10 @@ export default function CreatePostModal(props: CreatePostModalProps) {
         <div className="flex justify-around mt-5 w-full">
           <button
             type="submit"
+            disabled={isPending}
             className="bg-color4 text-white border-none rounded-xl px-3 py-1 font-bold text-lg cursor-pointer transition duration-300 hover:bg-color3"
           >
-            Create
+            {isPending ? "Creating..." : "Create"}
           </button>
           <button
             onClick={handleCancelCreatePost}

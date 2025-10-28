@@ -1,10 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
-import cookiesToken from "@/lib/helpers/cookiesToken";
 import deleteNotification from "@/lib/api/deleteNotification";
 import deleteAllNotifications from "@/lib/api/deleteAllNotifications";
 import retrieveNotifications from "@/lib/api/retrieveNotifications";
@@ -23,27 +22,24 @@ interface Notification {
 }
 
 export default function Notifications() {
-  const token = cookiesToken.get();
-  if (!token) return;
-
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [isPending, startTransition] = useTransition();
 
   const router = useRouter();
 
+  const loadNotifications = useCallback(() => {
+    retrieveNotifications()
+      .then((notifications) => setNotifications(notifications))
+      .catch((error: unknown) => {
+        const message =
+          error instanceof Error ? error.message : String(error);
+        alert(message);
+      });
+  }, []);
+
   useEffect(() => {
-    try {
-      retrieveNotifications(token)
-        .then((notifications) => setNotifications(notifications))
-        .catch((error: unknown) => {
-          const message =
-            error instanceof Error ? error.message : String(error);
-          alert(message);
-        });
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : String(error);
-      alert(message);
-    }
-  }, [token]);
+    loadNotifications();
+  }, [loadNotifications]);
 
   const handleProfile = (
     event: React.MouseEvent<HTMLAnchorElement>,
@@ -54,33 +50,27 @@ export default function Notifications() {
   };
 
   const handleDeleteNotification = (notificationId: string) => {
-    try {
-      deleteNotification(token, notificationId)
-        .then(() => {
-          return retrieveNotifications(token)
-            .then((notifications) => setNotifications(notifications))
-            .catch((error) => alert(error.messsage));
-        })
-        .catch((error) => alert(error.messsage));
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : String(error);
-      alert(message);
-    }
+    startTransition(() => {
+      deleteNotification(notificationId)
+        .then(() => loadNotifications())
+        .catch((error: unknown) => {
+          const message =
+            error instanceof Error ? error.message : String(error);
+          alert(message);
+        });
+    });
   };
 
   const handleDeleteAllNotifications = () => {
-    try {
-      deleteAllNotifications(token)
-        .then(() => {
-          return retrieveNotifications(token)
-            .then((notifications) => setNotifications(notifications))
-            .catch((error) => alert(error.messsage));
-        })
-        .catch((error) => alert(error.messsage));
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : String(error);
-      alert(message);
-    }
+    startTransition(() => {
+      deleteAllNotifications()
+        .then(() => loadNotifications())
+        .catch((error: unknown) => {
+          const message =
+            error instanceof Error ? error.message : String(error);
+          alert(message);
+        });
+    });
   };
 
   return (
@@ -195,9 +185,10 @@ export default function Notifications() {
       {notifications?.length > 0 && (
         <button
           onClick={handleDeleteAllNotifications}
+          disabled={isPending}
           className="mt-4 button w-32 bg-color4 text-white border-none rounded-xl m-1 px-3 py-1 font-bold text-lg cursor-pointer transition duration-300 hover:bg-color3"
         >
-          Clean all
+          {isPending ? "Cleaning..." : "Clean all"}
         </button>
       )}
     </section>

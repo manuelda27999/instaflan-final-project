@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useTransition } from "react";
 import Image from "next/image";
-import cookiesToken from "@/lib/helpers/cookiesToken";
 import searchUser from "@/lib/api/searchUser";
 import Link from "next/link";
 
@@ -14,10 +13,10 @@ interface User {
 
 export default function UsersSearchModal() {
   const containerRef = useRef<HTMLDivElement | null>(null);
-
-  const token = cookiesToken.get();
   const [users, setUsers] = useState<User[]>([]);
   const [usersList, setUsersList] = useState<boolean>(false);
+  const [isSearching, startTransition] = useTransition();
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -35,31 +34,28 @@ export default function UsersSearchModal() {
     };
   }, []);
 
-  let searchUserTimeOutId: NodeJS.Timeout | null = null;
-
   const handleSearchUsers = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (searchUserTimeOutId) clearTimeout(searchUserTimeOutId);
+    const text = event.target.value;
 
-    searchUserTimeOutId = setTimeout(() => {
-      const text = event.target.value;
-      if (!text) {
-        setUsers([]);
-        return;
-      }
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
 
-      try {
-        if (!token) return;
-        searchUser(token, text)
-          .then((users: User[]) => setUsers(users))
+    if (!text) {
+      setUsers([]);
+      return;
+    }
+
+    searchTimeoutRef.current = setTimeout(() => {
+      startTransition(() => {
+        searchUser(text)
+          .then((foundUsers) => setUsers(foundUsers))
           .catch((error: unknown) => {
             const message =
               error instanceof Error ? error.message : String(error);
             alert(message);
           });
-      } catch (error: unknown) {
-        const message = error instanceof Error ? error.message : String(error);
-        alert(message);
-      }
+      });
     }, 500);
   };
 
@@ -79,7 +75,11 @@ export default function UsersSearchModal() {
       {usersList && (
         <div className="absolute top-14 flex flex-col items-center mr-2">
           <div className="modal-peak"></div>
-          {users?.length > 0 ? (
+          {isSearching ? (
+            <div className="bg-white flex flex-col items-center justify-center rounded-xl px-4 py-2">
+              <p className="font-semibold text-color1 text-base">Searching...</p>
+            </div>
+          ) : users?.length > 0 ? (
             <div className="bg-white flex flex-col items-center justify-center rounded-xl">
               {users?.map((user) => (
                 <article className="px-2 py-1" key={user.id}>

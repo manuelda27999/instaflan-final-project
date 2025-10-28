@@ -1,12 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import cookiesToken from "@/lib/helpers/cookiesToken";
-
-import extractUserIdFromToken from "@/lib/helpers/extractUserIdFromToken";
 import retrieveChats from "@/lib/api/retrieveChats";
+import retrieveUser from "@/lib/api/retrieveUser";
 
 interface Chat {
   id: string;
@@ -25,18 +23,18 @@ interface Message {
 
 export default function Messages() {
   const [chats, setChats] = useState<Chat[]>([]);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
-  const token = typeof window !== "undefined" ? cookiesToken.get() : "";
-  if (!token) return;
-  const userId = extractUserIdFromToken(token);
-
   useEffect(() => {
-    if (!token) return;
+    let active = true;
 
-    try {
-      retrieveChats(token)
-        .then((chats) => {
+    startTransition(() => {
+      Promise.all([retrieveUser(), retrieveChats()])
+        .then(([user, chats]) => {
+          if (!active) return;
+          setCurrentUserId(user?.id ?? null);
           setChats(chats);
         })
         .catch((error: unknown) => {
@@ -44,11 +42,12 @@ export default function Messages() {
             error instanceof Error ? error.message : String(error);
           alert(message);
         });
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : String(error);
-      alert(message);
-    }
-  }, [token]);
+    });
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const handleNavigateChat = (
     event: React.MouseEvent<HTMLAnchorElement>,
@@ -69,7 +68,7 @@ export default function Messages() {
             onClick={(event) => handleNavigateChat(event, chat.id)}
             key={chat.id}
             className={
-              chat.unreadFor?.includes(userId)
+              currentUserId && chat.unreadFor?.includes(currentUserId)
                 ? "w-full flex flex-col border-b-2 bg-slate-200  border-b-gray-400 p-1 hover:bg-gray-300 cursor-pointer"
                 : "w-full flex flex-col border-b-2  border-b-gray-400 p-1 hover:bg-gray-300 cursor-pointer"
             }
@@ -100,12 +99,14 @@ export default function Messages() {
             </div>
             <p
               className={
-                chat.unreadFor?.includes(userId)
+                currentUserId && chat.unreadFor?.includes(currentUserId)
                   ? "m-2 ml-3 mb-0 font-bold"
                   : "m-2 ml-3 mb-0"
-              }
+            }
             >
-              {chat.messages[chat.messages.length - 1]?.text}
+              {isPending
+                ? "Loading..."
+                : chat.messages[chat.messages.length - 1]?.text}
             </p>
           </a>
         ))}

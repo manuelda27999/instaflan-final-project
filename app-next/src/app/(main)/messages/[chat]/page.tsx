@@ -1,14 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Image from "next/image";
 
 import { useModal } from "@/context/ModalContext";
-import cookiesToken from "@/lib/helpers/cookiesToken";
-import extractUserIdFromToken from "@/lib/helpers/extractUserIdFromToken";
 import retrieveChat from "@/lib/api/retrieveChat";
 import sendMessage from "@/lib/api/sendMessage";
+import retrieveUser from "@/lib/api/retrieveUser";
 
 interface Chat {
   id: string;
@@ -26,8 +25,8 @@ interface Message {
 
 export default function Chat() {
   const [chat, setChat] = useState<Chat | null>(null);
-
-  const token = cookiesToken.get();
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
 
   const pathname = usePathname();
 
@@ -35,17 +34,18 @@ export default function Chat() {
 
   const { openModal } = useModal();
 
-  if (!token) return;
-  const userId = extractUserIdFromToken(token);
-
   useEffect(() => {
     const chatId = pathname.slice(10);
 
     if (typeof chatId !== "string") throw new Error("Chat ID must be a string");
 
-    try {
-      retrieveChat(token, chatId)
-        .then((newChat) => {
+    let active = true;
+
+    startTransition(() => {
+      Promise.all([retrieveUser(), retrieveChat(chatId)])
+        .then(([user, newChat]) => {
+          if (!active) return;
+          setCurrentUserId(user?.id ?? null);
           setChat(newChat);
         })
         .catch((error: unknown) => {
@@ -53,30 +53,28 @@ export default function Chat() {
             error instanceof Error ? error.message : String(error);
           alert(message);
         });
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : String(error);
-      alert(message);
-    }
+    });
 
     const intervalId = setInterval(() => {
-      try {
-        retrieveChat(token, chatId)
-          .then((newChat) => {
-            if (newChat !== chat) setChat(newChat);
-          })
-          .catch((error: unknown) => {
-            const message =
-              error instanceof Error ? error.message : String(error);
-            alert(message);
-          });
-      } catch (error: unknown) {
-        const message = error instanceof Error ? error.message : String(error);
-        alert(message);
-      }
+      retrieveChat(chatId)
+        .then((newChat) => {
+          if (!active) return;
+          setChat((prev) =>
+            JSON.stringify(prev) === JSON.stringify(newChat) ? prev : newChat
+          );
+        })
+        .catch((error: unknown) => {
+          const message =
+            error instanceof Error ? error.message : String(error);
+          alert(message);
+        });
     }, 2000);
 
-    return () => clearInterval(intervalId);
-  }, [chat, pathname, token]);
+    return () => {
+      active = false;
+      clearInterval(intervalId);
+    };
+  }, [pathname]);
 
   const handleSendMessage = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -88,21 +86,20 @@ export default function Chat() {
 
     if (typeof chatId !== "string") throw new Error("Chat ID must be a string");
 
-    try {
-      sendMessage(token, chatId, text)
+    startTransition(() => {
+      sendMessage(chatId, text)
         .then(() =>
-          retrieveChat(token, chatId).then((chat) => {
+          retrieveChat(chatId).then((chat) => {
             (form.elements.namedItem("message") as HTMLInputElement).value = "";
             setChat(chat);
           })
         )
-        .catch((error) => {
-          alert(error.message);
+        .catch((error: unknown) => {
+          const message =
+            error instanceof Error ? error.message : String(error);
+          alert(message);
         });
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : String(error);
-      alert(message);
-    }
+    });
   };
 
   const handleProfile = (
@@ -164,7 +161,7 @@ export default function Chat() {
           <article
             key={message.id}
             className={
-              message.author === userId
+              currentUserId && message.author === currentUserId
                 ? "ml-12 flex justify-end"
                 : "mr-12 flex"
             }
@@ -177,7 +174,7 @@ export default function Chat() {
               <div className="flex flex-col items-end bg-color5 w-auto m-1 px-2 py-1 rounded-xl">
                 <div className="flex ">
                   <p className="">{message?.text}</p>
-                  {message.author === userId && (
+                  {currentUserId && message.author === currentUserId && (
                     <button
                       onClick={() =>
                         openModal("edit-delete-message", { message: message })
@@ -193,7 +190,7 @@ export default function Chat() {
             ) : (
               <div className="flex flex-start items-end bg-color5 w-auto m-1 px-2 py-1 rounded-xl">
                 <p className="">{message?.text}</p>
-                {message.author === userId && (
+                {currentUserId && message.author === currentUserId && (
                   <button
                     onClick={() =>
                       openModal("edit-delete-message", { message: message })
@@ -218,8 +215,11 @@ export default function Chat() {
           className="w-full rounded-full border-4 mr-3 pl-3 border-black"
           type="text"
         />
-        <button className="button bg-color4 text-white border-none rounded-xl px-3 py-1 font-bold text-lg cursor-pointer transition duration-300 hover:bg-color3">
-          Send
+        <button
+          disabled={isPending}
+          className="button bg-color4 text-white border-none rounded-xl px-3 py-1 font-bold text-lg cursor-pointer transition duration-300 hover:bg-color3 disabled:opacity-70 disabled:cursor-not-allowed"
+        >
+          {isPending ? "Sending..." : "Send"}
         </button>
       </form>
     </section>

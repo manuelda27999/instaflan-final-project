@@ -1,8 +1,8 @@
 "use client";
 
+import { useTransition } from "react";
 import deleteMessage from "@/lib/api/deleteMessage";
 import editMessage from "@/lib/api/editMessage";
-import cookiesToken from "@/lib/helpers/cookiesToken";
 
 interface EditDeleteMessageModalProps {
   message: Message;
@@ -22,7 +22,7 @@ export default function EditDeleteMessageModal(
 ) {
   const message = props.message;
 
-  const token = cookiesToken.get();
+  const [isPending, startTransition] = useTransition();
 
   const handleEditMessage = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -30,33 +30,31 @@ export default function EditDeleteMessageModal(
     const form = event.target as HTMLFormElement;
     const text = (form.elements.namedItem("text") as HTMLInputElement).value;
 
-    try {
-      editMessage(token, message.id, text)
+    startTransition(() => {
+      editMessage(message.id, text)
         .then(() => {
           props.onHideEditDeletePost();
         })
-        .catch((error) => {
-          alert(error.message);
+        .catch((error: unknown) => {
+          const message =
+            error instanceof Error ? error.message : String(error);
+          alert(message);
         });
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : String(error);
-      alert(message);
-    }
+    });
   };
 
   const handleDeleteMessage = () => {
-    try {
-      deleteMessage(token, message.id)
+    startTransition(() => {
+      deleteMessage(message.id)
         .then(() => {
           props.onHideEditDeletePost();
         })
-        .catch((error) => {
-          alert(error.message);
+        .catch((error: unknown) => {
+          const message =
+            error instanceof Error ? error.message : String(error);
+          alert(message);
         });
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : String(error);
-      alert(message);
-    }
+    });
   };
 
   const handleCancelEditDeleteMessage = () => props.onHideEditDeletePost();
@@ -85,16 +83,18 @@ export default function EditDeleteMessageModal(
             <div className="flex justify-around mb-5">
               <button
                 type="submit"
+                disabled={isPending}
                 className="bg-color4 text-white border-none rounded-xl px-3 py-1 font-bold text-lg cursor-pointer transition duration-300 hover:bg-color3"
               >
-                Edit
+                {isPending ? "Saving..." : "Edit"}
               </button>
               <button
                 onClick={handleDeleteMessage}
                 type="button"
+                disabled={isPending}
                 className="bg-color4 text-white border-none rounded-xl px-3 py-1 font-bold text-lg cursor-pointer transition duration-300 hover:bg-color3"
               >
-                Delete
+                {isPending ? "Deleting..." : "Delete"}
               </button>
             </div>
             <button

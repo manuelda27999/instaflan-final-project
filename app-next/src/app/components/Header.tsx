@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useTransition } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
 import usePageTitle from "@/lib/hooks/usePageTittle";
-import cookiesToken from "@/lib/helpers/cookiesToken";
 import UsersSearchModal from "@/app/components/UsersSearchModal";
+import { deleteSession } from "@/lib/helpers/session";
 
 export default function Header() {
   const pathname = usePathname();
@@ -13,20 +13,23 @@ export default function Header() {
 
   const [page, setPage] = useState("Instaflan");
   const pageTitle = usePageTitle(pathname);
+  const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
     setPage(pageTitle);
   }, [pathname, pageTitle]);
 
-  useEffect(() => {
-    const token = cookiesToken.exist();
-
-    if (!token) router.push("/login");
-  }, [router]);
-
   const handleLogout = () => {
-    cookiesToken.delete();
-    router.push("/login");
+    startTransition(() => {
+      deleteSession()
+        .then(() => {
+          router.push("/login");
+        })
+        .catch((error: unknown) => {
+          const message = error instanceof Error ? error.message : String(error);
+          alert(message);
+        });
+    });
   };
 
   return (
@@ -48,9 +51,10 @@ export default function Header() {
         <nav>
           <button
             onClick={handleLogout}
+            disabled={isPending}
             className="bg-color4 text-white border-none rounded-xl px-3 py-1 font-bold text-lg cursor-pointer transition duration-300 hover:bg-color3"
           >
-            Logout
+            {isPending ? "Logging out..." : "Logout"}
           </button>
         </nav>
       ) : (

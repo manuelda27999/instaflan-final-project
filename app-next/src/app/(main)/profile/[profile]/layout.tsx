@@ -1,15 +1,23 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import {
+  useEffect,
+  useState,
+  useCallback,
+  useTransition,
+} from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Image from "next/image";
 
-import cookiesToken from "@/lib/helpers/cookiesToken";
-import extractUserIdFromToken from "@/lib/helpers/extractUserIdFromToken";
 import retrieveUserById from "@/lib/api/retrieveUserById";
+import retrieveUser from "@/lib/api/retrieveUser";
 import toggleFollowUser from "@/lib/api/toggleFollowUser";
 import createChat from "@/lib/api/createChat";
 import { useModal } from "@/context/ModalContext";
+
+import EditUserModal from "../../../components/modals/EditUserModal";
+import FollowedModal from "../../../components/modals/FollowedModal";
+import FollowingModal from "../../../components/modals/FollowingModal";
 
 interface User {
   name: string;
@@ -27,71 +35,67 @@ export default function ProfileLayout({
 }) {
   const router = useRouter();
   const pathname = usePathname();
+  const { modalState, closeModal, openModal } = useModal();
+
   const userIdProfile = pathname.split("/")[2];
 
-  const token = cookiesToken.get();
-  if (!token) return;
-  const userId = extractUserIdFromToken(token);
-
-  const { openModal } = useModal();
-
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [userProfile, setUserProfile] = useState<User | null>(null);
+  const [isPending, startTransition] = useTransition();
 
   const updateUser = useCallback(() => {
-    try {
-      retrieveUserById(token, userIdProfile)
-        .then((userProfile) => {
-          setUserProfile(userProfile);
-        })
-        .catch((error: unknown) => {
-          const message =
-            error instanceof Error ? error.message : String(error);
-          alert(message);
-        });
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : String(error);
-      alert(message);
-    }
-  }, [token, userIdProfile]);
+    retrieveUserById(userIdProfile)
+      .then((profile) => {
+        setUserProfile(profile);
+      })
+      .catch((error: unknown) => {
+        const message = error instanceof Error ? error.message : String(error);
+        alert(message);
+      });
+  }, [userIdProfile]);
 
   useEffect(() => {
-    updateUser();
-  }, [updateUser]);
+    let active = true;
 
-  function handleFollowUser() {
-    if (!token) return;
-    try {
-      toggleFollowUser(token, userIdProfile)
-        .then(() => {
-          return retrieveUserById(token, userIdProfile);
-        })
-        .then((userProfile) => setUserProfile(userProfile))
+    Promise.all([retrieveUser(), retrieveUserById(userIdProfile)])
+      .then(([currentUser, profile]) => {
+        if (!active) return;
+        setCurrentUserId(currentUser?.id ?? null);
+        setUserProfile(profile);
+      })
+      .catch((error: unknown) => {
+        const message = error instanceof Error ? error.message : String(error);
+        alert(message);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [userIdProfile]);
+
+  const handleFollowUser = () => {
+    startTransition(() => {
+      toggleFollowUser(userIdProfile)
+        .then(() => retrieveUserById(userIdProfile))
+        .then((profile) => setUserProfile(profile))
         .catch((error: unknown) => {
-          const message =
-            error instanceof Error ? error.message : String(error);
+          const message = error instanceof Error ? error.message : String(error);
           alert(message);
         });
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : String(error);
-      alert(message);
-    }
-  }
+    });
+  };
 
   const handleSendMessageModal = () => {
-    try {
-      createChat(token, userIdProfile)
+    startTransition(() => {
+      createChat(userIdProfile)
         .then((chatId) => {
-          return router.push(`/messages/${chatId}`);
+          router.push(`/messages/${chatId}`);
         })
         .catch((error: unknown) => {
-          const message =
-            error instanceof Error ? error.message : String(error);
+          const message = error instanceof Error ? error.message : String(error);
           alert(message);
         });
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : String(error);
-      alert(message);
-    }
+    });
   };
 
   return (
@@ -139,7 +143,7 @@ export default function ProfileLayout({
       <p className="text-color1 w-full font-semibold border-b-2 border-b-gray-400 px-3 py-2 pt-0">
         {userProfile?.description}
       </p>
-      {userId === userIdProfile ? (
+      {currentUserId === userIdProfile ? (
         <button
           onClick={() => {
             if (!userProfile) return;
@@ -159,15 +163,21 @@ export default function ProfileLayout({
         <div className="flex justify-around items-center gap-2 m-2">
           <button
             onClick={handleFollowUser}
+            disabled={isPending}
             className="button bg-color4 text-white border-none rounded-xl px-3 py-1 font-bold text-lg cursor-pointer transition duration-300 hover:bg-color3 edit-profile-button"
           >
-            {userProfile?.follow ? "Unfollow" : "Follow"}
+            {isPending
+              ? "Updating..."
+              : userProfile?.follow
+              ? "Unfollow"
+              : "Follow"}
           </button>
           <button
             onClick={handleSendMessageModal}
+            disabled={isPending}
             className="button bg-color4 text-white border-none rounded-xl px-3 py-1 font-bold text-lg cursor-pointer transition duration-300 hover:bg-color3 edit-profile-button"
           >
-            Direct
+            {isPending ? "Opening..." : "Direct"}
           </button>
         </div>
       )}
@@ -176,19 +186,34 @@ export default function ProfileLayout({
           onClick={() => router.push(`/profile/${userIdProfile}/posts`)}
           className="button bg-color4 text-white border-none rounded-xl px-3 py-1 font-bold text-lg cursor-pointer transition duration-300 hover:bg-color3"
         >
-          {userId === userIdProfile ? "My posts" : "Profile posts"}
+          {currentUserId === userIdProfile ? "My posts" : "Profile posts"}
         </button>
         <button
           onClick={() => router.push(`/profile/${userIdProfile}/fav-posts`)}
           className="button bg-color4 text-white border-none rounded-xl px-3 py-1 font-bold text-lg cursor-pointer transition duration-300 hover:bg-color3"
         >
-          {userId === userIdProfile
+          {currentUserId === userIdProfile
             ? "My favorite posts"
             : "Favorite profile posts"}
         </button>
       </div>
 
       <main>{children}</main>
+      {modalState && modalState.name === "edit-user-modal" && (
+        <EditUserModal
+          user={modalState.props.user}
+          onEditUser={() => {
+            modalState.props.callback?.(closeModal);
+          }}
+          onHideEditUser={() => closeModal()}
+        />
+      )}
+      {modalState && modalState.name === "followed-modal" && (
+        <FollowedModal onHideFollowedModal={() => closeModal()} />
+      )}
+      {modalState && modalState.name === "following-modal" && (
+        <FollowingModal onHideFollowingModal={() => closeModal()} />
+      )}
     </section>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
+import { useTransition } from "react";
 import editUser from "@/lib/api/editUser";
-import cookiesToken from "@/lib/helpers/cookiesToken";
 
 interface User {
   name: string;
@@ -17,7 +17,7 @@ interface EditUserModalProps {
 
 export default function EditUserModal(props: EditUserModalProps) {
   const user = props.user;
-  const token = cookiesToken.get();
+  const [isPending, startTransition] = useTransition();
 
   const handleSubmitUser = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -29,18 +29,17 @@ export default function EditUserModal(props: EditUserModalProps) {
       form.elements.namedItem("description") as HTMLInputElement
     ).value;
 
-    try {
-      editUser(token, name, image, description)
+    startTransition(() => {
+      editUser(name, image, description)
         .then(() => {
           props.onEditUser();
         })
-        .catch((error) => {
-          alert(error.message);
+        .catch((error: unknown) => {
+          const message =
+            error instanceof Error ? error.message : String(error);
+          alert(message);
         });
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : String(error);
-      alert(message);
-    }
+    });
   };
 
   const handleCancelEditUser = () => props.onHideEditUser();
@@ -80,9 +79,10 @@ export default function EditUserModal(props: EditUserModalProps) {
           <div className="flex justify-around mt-5 w-full">
             <button
               type="submit"
+              disabled={isPending}
               className="bg-color4 text-white border-none rounded-xl px-3 py-1 font-bold text-lg cursor-pointer transition duration-300 hover:bg-color3"
             >
-              Edit
+              {isPending ? "Saving..." : "Edit"}
             </button>
             <button
               onClick={handleCancelEditUser}

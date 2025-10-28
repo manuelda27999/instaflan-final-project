@@ -1,31 +1,31 @@
-import { validateId } from "../helpers/validators";
+"use server";
 
-export default function searchUser(userId: string, text: string) {
-  validateId(userId);
+import { apiFetch } from "./utils";
+import { validateText } from "../helpers/validators";
 
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+interface User {
+  id: string;
+  name: string;
+  image: string;
+}
 
-  if (!apiUrl) {
-    throw new Error("API URL is not defined in environment variables.");
+export default async function searchUser(text: string): Promise<User[]> {
+  validateText(text);
+
+  const trimmedText = text.trim();
+  if (!trimmedText) {
+    throw new Error(
+      "Search text must contain at least one non-space character."
+    );
   }
 
-  return fetch(`${apiUrl}/search/${text}`, {
-    headers: {
-      Authorization: `Bearer ${userId}`,
-    },
-  }).then((res) => {
-    if (res.status === 200) {
-      return res.json().then((body) => {
-        const users = body;
-
-        return users;
-      });
-    } else if (res.status === 400) {
-      return res.json().then((body) => {
-        throw new Error(body.error);
-      });
-    } else {
-      throw new Error(`Unexpected response status: ${res.status}`);
+  const response = await apiFetch(
+    `/search/${encodeURIComponent(trimmedText)}`,
+    {
+      method: "GET",
+      errorMessage: "Unexpected error searching users",
     }
-  });
+  );
+
+  return response.json();
 }

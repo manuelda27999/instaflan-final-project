@@ -1,11 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
 
-import cookiesToken from "@/lib/helpers/cookiesToken";
 import toggleFollowUser from "@/lib/api/toggleFollowUser";
 import retrieveFollowing from "@/lib/api/retrieveFollowing";
-import extractUserIdFromToken from "@/lib/helpers/extractUserIdFromToken";
+import retrieveUser from "@/lib/api/retrieveUser";
 
 interface FollowedModalProps {
   onHideFollowingModal: () => void;
@@ -19,29 +18,25 @@ interface User {
 }
 
 export default function FollowingModal(props: FollowedModalProps) {
-  const token = cookiesToken.get();
   const [users, setUsers] = useState<User[]>([]);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
   const pathname = usePathname();
   const userIdProfile = pathname.split("/")[2];
 
-  const userId = extractUserIdFromToken(token);
-
   useEffect(() => {
-    try {
-      retrieveFollowing(token, userIdProfile)
-        .then((users) => setUsers(users))
-        .catch((error: unknown) => {
-          const message =
-            error instanceof Error ? error.message : String(error);
-          alert(message);
-        });
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : String(error);
-      alert(message);
-    }
-  }, [token, userIdProfile]);
+    Promise.all([retrieveUser(), retrieveFollowing(userIdProfile)])
+      .then(([user, following]) => {
+        setCurrentUserId(user?.id ?? null);
+        setUsers(following);
+      })
+      .catch((error: unknown) => {
+        const message = error instanceof Error ? error.message : String(error);
+        alert(message);
+      });
+  }, [userIdProfile]);
 
   const handleProfile = (
     event: React.MouseEvent<HTMLAnchorElement>,
@@ -57,13 +52,15 @@ export default function FollowingModal(props: FollowedModalProps) {
   };
 
   function handleFollowUser(userFollowId: string) {
-    try {
-      toggleFollowUser(token, userFollowId)
+    startTransition(() => {
+      toggleFollowUser(userFollowId)
         .then(() => {
           setUsers((users) => {
             const users2 = [...users];
 
             const index = users2.findIndex((user) => user.id === userFollowId);
+            if (index === -1) return users;
+
             const userFind = users2[index];
 
             const user2 = { ...userFind };
@@ -80,10 +77,7 @@ export default function FollowingModal(props: FollowedModalProps) {
             error instanceof Error ? error.message : String(error);
           alert(message);
         });
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : String(error);
-      alert(message);
-    }
+    });
   }
 
   return (
@@ -115,12 +109,13 @@ export default function FollowingModal(props: FollowedModalProps) {
                       {user.name}
                     </a>
                   </div>
-                  {userId === userIdProfile && (
+                  {currentUserId === userIdProfile && (
                     <button
                       onClick={() => handleFollowUser(user.id)}
+                      disabled={isPending}
                       className="button bg-color4 text-white border-none rounded-xl px-3 py-1 ml-4 font-bold text-lg cursor-pointer transition duration-300 hover:bg-color3 edit-profile-button"
                     >
-                      {user?.follow ? "Unfollow" : "Follow"}
+                      {isPending ? "Updating..." : user?.follow ? "Unfollow" : "Follow"}
                     </button>
                   )}
                 </div>

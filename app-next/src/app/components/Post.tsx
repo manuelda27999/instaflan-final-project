@@ -3,8 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import cookiesToken from "@/lib/helpers/cookiesToken";
-import extractUserIdFromToken from "@/lib/helpers/extractUserIdFromToken";
+import retrieveUser from "@/lib/api/retrieveUser";
 
 import { useModal } from "@/context/ModalContext";
 
@@ -38,18 +37,31 @@ interface PostProps {
 
 export default function Post(props: PostProps) {
   const [post, setPost] = useState<Post>(props.post);
-  const token = cookiesToken.get();
-  let userId: string | null = null;
-
-  if (token) {
-    userId = extractUserIdFromToken(token);
-  }
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
   const { openModal } = useModal();
 
   useEffect(() => {
     setPost(props.post);
   }, [props.post]);
+
+  useEffect(() => {
+    let active = true;
+
+    retrieveUser()
+      .then((user) => {
+        if (!active) return;
+        setCurrentUserId(user?.id ?? null);
+      })
+      .catch((error: unknown) => {
+        const message = error instanceof Error ? error.message : String(error);
+        alert(message);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   function updateThisPost(postParam: {
     id: string;
@@ -151,7 +163,7 @@ export default function Post(props: PostProps) {
           Comment
         </button>
         <div className="flex justify-between gap-2">
-          {userId === post.author.id && (
+          {currentUserId === post.author.id && (
             <button
               onClick={() =>
                 openModal("edit-post-modal", {
@@ -170,7 +182,7 @@ export default function Post(props: PostProps) {
               Edit
             </button>
           )}
-          {userId === post.author.id && (
+          {currentUserId === post.author.id && (
             <button
               onClick={() =>
                 openModal("delete-post-modal", {
