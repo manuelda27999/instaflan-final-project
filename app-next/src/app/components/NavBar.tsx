@@ -13,6 +13,12 @@ interface User {
   image: string;
 }
 
+interface Chat {
+  id: string;
+  participants: string[];
+  unreadFor: string[];
+}
+
 export default function NavBar() {
   const [userIdProfile, setUserIdProfile] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
@@ -27,7 +33,7 @@ export default function NavBar() {
         .then((chats) => {
           if (!active) return;
 
-          const counter = chats.reduce((total, chat) => {
+          const counter = chats.reduce((total: number, chat: Chat) => {
             if (!userId) return total;
             return chat.unreadFor.includes(userId) ? total + 1 : total;
           }, 0);
@@ -35,7 +41,8 @@ export default function NavBar() {
           setMessagesNotReading(counter);
         })
         .catch((error: unknown) => {
-          const message = error instanceof Error ? error.message : String(error);
+          const message =
+            error instanceof Error ? error.message : String(error);
           alert(message);
         });
     };

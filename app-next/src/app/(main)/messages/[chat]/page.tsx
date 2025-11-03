@@ -8,6 +8,7 @@ import { useModal } from "@/context/ModalContext";
 import retrieveChat from "@/lib/api/retrieveChat";
 import sendMessage from "@/lib/api/sendMessage";
 import retrieveUser from "@/lib/api/retrieveUser";
+import ProfileImage from "@/app/components/ProfileImage";
 
 interface Chat {
   id: string;
@@ -127,18 +128,12 @@ export default function Chat() {
     <section className="flex flex-col">
       <div className="fixed w-full bg-white flex justify-between items-center border-b-2 border-gray-400 py-1 px-2">
         <div className="flex items-center">
-          <Image
-            unoptimized
-            width={48}
-            height={48}
-            className="w-12 h-12 rounded-full object-cover"
-            src={chat?.users[0].image || "/images/default-profile.webp"}
-            alt="user profile image"
-            onError={(e) => {
-              const target = e.target as HTMLImageElement;
-              target.src = "/images/default-profile.webp";
-            }}
-          />
+          {chat && (
+            <ProfileImage
+              name={chat?.users[0].name}
+              image={chat?.users[0].name}
+            />
+          )}
           <a
             onClick={(event) =>
               handleProfile(event, chat?.users[0].id ? chat?.users[0].id : "")

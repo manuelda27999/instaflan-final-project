@@ -6,6 +6,7 @@ import Link from "next/link";
 import retrieveUser from "@/lib/api/retrieveUser";
 
 import { useModal } from "@/context/ModalContext";
+import ProfileImage from "./ProfileImage";
 
 interface Post {
   id: string;
@@ -80,18 +81,7 @@ export default function Post(props: PostProps) {
     <article key={post.id} className="bg-color5 mb-3">
       <div className="flex justify-between items-center">
         <div className="flex justify-start items-center pl-3 py-1">
-          <Image
-            unoptimized
-            width={48}
-            height={48}
-            className="w-12 h-12 rounded-full object-cover mr-2"
-            src={post.author.image || "/images/default-profile.webp"}
-            alt={post.author.name}
-            onError={(e) => {
-              const target = e.target as HTMLImageElement;
-              target.src = "/images/default-profile.webp";
-            }}
-          />
+          <ProfileImage name={post.author.name} image={post.author.image} />
           <Link
             href={`/profile/${post.author.id}/posts`}
             className="font-semibold text-color1 text-xl cursor-pointer"
@@ -132,9 +122,13 @@ export default function Post(props: PostProps) {
                 src={
                   comment.author.image
                     ? comment.author.image
-                    : "/default-profile.png"
+                    : "/images/default-profile.webp"
                 }
                 alt=""
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.src = "/images/default-profile.webp";
+                }}
               />
               <Link
                 className="text-xs text-color1 font-bold whitespace-nowrap"

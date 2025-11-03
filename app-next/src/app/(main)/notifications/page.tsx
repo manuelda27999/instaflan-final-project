@@ -7,6 +7,7 @@ import Image from "next/image";
 import deleteNotification from "@/lib/api/deleteNotification";
 import deleteAllNotifications from "@/lib/api/deleteAllNotifications";
 import retrieveNotifications from "@/lib/api/retrieveNotifications";
+import ProfileImage from "@/app/components/ProfileImage";
 
 interface Notification {
   id: string;
@@ -31,8 +32,7 @@ export default function Notifications() {
     retrieveNotifications()
       .then((notifications) => setNotifications(notifications))
       .catch((error: unknown) => {
-        const message =
-          error instanceof Error ? error.message : String(error);
+        const message = error instanceof Error ? error.message : String(error);
         alert(message);
       });
   }, []);
@@ -84,13 +84,9 @@ export default function Notifications() {
         <article key={notification.id} className="w-full">
           {notification.text === "Follow" && (
             <div className="flex items-center p-1 border-b-gray-400 border-b-2">
-              <Image
-                unoptimized
-                width={48}
-                height={48}
-                className="w-12 h-12 rounded-full object-cover"
-                src={notification.user.image}
-                alt=""
+              <ProfileImage
+                name={notification.user.name}
+                image={notification.user.image}
               />
               <a
                 onClick={(event) => handleProfile(event, notification.user.id)}
@@ -110,13 +106,9 @@ export default function Notifications() {
           )}
           {notification.text === "Like" && notification.post && (
             <div className="flex items-center p-1 border-b-gray-400 border-b-2">
-              <Image
-                unoptimized
-                width={48}
-                height={48}
-                className="w-12 h-12 rounded-full object-cover"
-                src={notification.user.image}
-                alt=""
+              <ProfileImage
+                name={notification.user.name}
+                image={notification.user.image}
               />
               <a
                 onClick={(event) => handleProfile(event, notification.user.id)}
@@ -146,13 +138,9 @@ export default function Notifications() {
           )}
           {notification.text === "Comment" && notification.post && (
             <div className="flex items-center p-1 border-b-gray-400 border-b-2">
-              <Image
-                unoptimized
-                width={48}
-                height={48}
-                className="w-12 h-12 rounded-full object-cover"
-                src={notification.user.image}
-                alt=""
+              <ProfileImage
+                name={notification.user.name}
+                image={notification.user.image}
               />
               <a
                 onClick={(event) => handleProfile(event, notification.user.id)}

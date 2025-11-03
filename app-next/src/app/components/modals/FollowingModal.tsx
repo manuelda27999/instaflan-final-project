@@ -5,6 +5,7 @@ import Image from "next/image";
 import toggleFollowUser from "@/lib/api/toggleFollowUser";
 import retrieveFollowing from "@/lib/api/retrieveFollowing";
 import retrieveUser from "@/lib/api/retrieveUser";
+import ProfileImage from "../ProfileImage";
 
 interface FollowedModalProps {
   onHideFollowingModal: () => void;
@@ -94,14 +95,7 @@ export default function FollowingModal(props: FollowedModalProps) {
               <article key={user.id} className="flex w-full">
                 <div className="flex justify-between items-center w-full bg-white m-1 p-1 px-2 rounded-2xl">
                   <div className="flex flex-start items-center">
-                    <Image
-                      unoptimized
-                      width={48}
-                      height={48}
-                      className="rounded-full mr-1 w-12 h-12 object-cover"
-                      src={user.image}
-                      alt={user.name}
-                    />
+                    <ProfileImage name={user.name} image={user.image} />
                     <a
                       onClick={(event) => handleProfile(event, user.id)}
                       className="font-semibold text-color1 text-lg cursor-pointer"
@@ -115,7 +109,11 @@ export default function FollowingModal(props: FollowedModalProps) {
                       disabled={isPending}
                       className="button bg-color4 text-white border-none rounded-xl px-3 py-1 ml-4 font-bold text-lg cursor-pointer transition duration-300 hover:bg-color3 edit-profile-button"
                     >
-                      {isPending ? "Updating..." : user?.follow ? "Unfollow" : "Follow"}
+                      {isPending
+                        ? "Updating..."
+                        : user?.follow
+                        ? "Unfollow"
+                        : "Follow"}
                     </button>
                   )}
                 </div>

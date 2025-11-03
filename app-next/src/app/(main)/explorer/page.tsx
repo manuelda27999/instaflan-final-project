@@ -9,6 +9,7 @@ import retrievePostsNotFollowed from "@/lib/api/retrievePostsNotFollowed";
 import toggleFollowUser from "@/lib/api/toggleFollowUser";
 import toggleFavPost from "@/lib/api/toggleFavPost";
 import Post from "@/app/components/Post";
+import ProfileImage from "@/app/components/ProfileImage";
 
 interface User {
   id: string;
@@ -60,7 +61,9 @@ export default function Explorer() {
     startTransition(() => {
       toggleFollowUser(userIdProfile)
         .then(() => {
-          setUsers((users) => users.filter((user) => user.id !== userIdProfile));
+          setUsers((users) =>
+            users.filter((user) => user.id !== userIdProfile)
+          );
         })
         .catch((error: unknown) => {
           const message =
@@ -143,18 +146,7 @@ export default function Explorer() {
             className="flex mb-4 w-80 bg-color5 rounded-full justify-between items-center pr-5 pl-2 pt-1 pb-1"
           >
             <div className="flex items-center">
-              <Image
-                unoptimized
-                width={48}
-                height={48}
-                className="w-12 h-12 rounded-full object-cover mr-2"
-                src={user.image || "/images/default-profile.webp"}
-                alt={user.name}
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.src = "/images/default-profile.webp";
-                }}
-              />
+              <ProfileImage name={user.name} image={user.image} />
               <Link
                 href={`profile/${user.id}/posts`}
                 className="font-semibold text-color1 text-xl"

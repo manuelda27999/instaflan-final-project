@@ -4,6 +4,7 @@ import { useEffect, useState, useRef, useTransition } from "react";
 import Image from "next/image";
 import searchUser from "@/lib/api/searchUser";
 import Link from "next/link";
+import ProfileImage from "./ProfileImage";
 
 interface User {
   id: string;
@@ -77,21 +78,16 @@ export default function UsersSearchModal() {
           <div className="modal-peak"></div>
           {isSearching ? (
             <div className="bg-white flex flex-col items-center justify-center rounded-xl px-4 py-2">
-              <p className="font-semibold text-color1 text-base">Searching...</p>
+              <p className="font-semibold text-color1 text-base">
+                Searching...
+              </p>
             </div>
           ) : users?.length > 0 ? (
             <div className="bg-white flex flex-col items-center justify-center rounded-xl">
               {users?.map((user) => (
                 <article className="px-2 py-1" key={user.id}>
                   <div className="flex items-center">
-                    <Image
-                      unoptimized
-                      width={48}
-                      height={48}
-                      className="rounded-full mr-1 w-12 h-12 object-cover"
-                      src={user.image}
-                      alt={user.name}
-                    />
+                    <ProfileImage name={user.name} image={user.image} />
                     <Link
                       href={`/profile/${user.id}/posts`}
                       className="font-semibold text-color1 text-lg cursor-pointer"

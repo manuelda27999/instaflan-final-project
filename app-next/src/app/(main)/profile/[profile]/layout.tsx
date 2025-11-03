@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  useEffect,
-  useState,
-  useCallback,
-  useTransition,
-} from "react";
+import { useEffect, useState, useCallback, useTransition } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Image from "next/image";
 
@@ -18,6 +13,7 @@ import { useModal } from "@/context/ModalContext";
 import EditUserModal from "../../../components/modals/EditUserModal";
 import FollowedModal from "../../../components/modals/FollowedModal";
 import FollowingModal from "../../../components/modals/FollowingModal";
+import ProfileImage from "@/app/components/ProfileImage";
 
 interface User {
   name: string;
@@ -79,7 +75,8 @@ export default function ProfileLayout({
         .then(() => retrieveUserById(userIdProfile))
         .then((profile) => setUserProfile(profile))
         .catch((error: unknown) => {
-          const message = error instanceof Error ? error.message : String(error);
+          const message =
+            error instanceof Error ? error.message : String(error);
           alert(message);
         });
     });
@@ -92,7 +89,8 @@ export default function ProfileLayout({
           router.push(`/messages/${chatId}`);
         })
         .catch((error: unknown) => {
-          const message = error instanceof Error ? error.message : String(error);
+          const message =
+            error instanceof Error ? error.message : String(error);
           alert(message);
         });
     });
@@ -102,19 +100,9 @@ export default function ProfileLayout({
     <section className="flex flex-col items-center">
       <div className="flex w-full justify-between items-center py-2 px-3">
         <div className="flex items-center">
-          <Image
-            unoptimized
-            width={48}
-            height={48}
-            alt={"Profile image of " + userProfile?.name}
-            className="w-12 h-12 rounded-full object-cover mr-2"
-            src={
-              userProfile?.image
-                ? userProfile?.image
-                : "/images/default-profile.webp"
-            }
-          />
-
+          {userProfile && (
+            <ProfileImage name={userProfile?.name} image={userProfile?.image} />
+          )}
           <h3 className="font-semibold text-color1 text-xl">
             {userProfile?.name}
           </h3>
