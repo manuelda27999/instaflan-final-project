@@ -27,8 +27,7 @@ export default function LandingPage() {
           <p className="max-w-3xl text-base text-slate-300 sm:text-lg">
             This project is my sandbox for sharpening full-stack skills with
             Next.js, TypeScript, Tailwind, Express, and MongoDB. Jump in, click
-            through the flows, and see how I am recreating core social features
-            while documenting the journey.
+            through the flows, and see how I am recreating core social features.
           </p>
 
           <div className="mt-4 flex w-full flex-col justify-center gap-4 sm:flex-row sm:gap-5">

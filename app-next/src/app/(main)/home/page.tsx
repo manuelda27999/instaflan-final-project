@@ -42,7 +42,6 @@ export default function AllPosts() {
       })
       .catch((error: unknown) => {
         const message = error instanceof Error ? error.message : String(error);
-        alert(message);
       });
   }, []);
 
@@ -83,34 +82,56 @@ export default function AllPosts() {
         .catch((error: unknown) => {
           const message =
             error instanceof Error ? error.message : String(error);
-          alert(message);
         });
     });
   }
 
   return (
-    <section className="pt-2">
+    <section className="space-y-8">
       {posts.length === 0 && !isPending && (
-        <h2 className="text-gray-500 mt-6 text-center text-xl font-bold">
-          You do not follow anyone,{" "}
+        <div className="rounded-3xl border border-white/10 bg-white/5 p-8 text-center shadow-[0_40px_120px_-70px_rgba(56,189,248,0.7)] backdrop-blur-xl">
+          <p className="text-xs uppercase tracking-[0.4em] text-slate-300">
+            Feed warming up
+          </p>
+          <h2 className="mt-4 text-2xl font-semibold leading-tight text-white">
+            You are not following anyone yet
+          </h2>
+          <p className="mt-3 text-sm text-slate-300">
+            Discover new creators and start curating your sweet feed.
+          </p>
           <Link
-            className="text-color3 mt-6 text-center text-xl font-bold"
+            className="mt-6 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-6 py-2 text-sm font-semibold text-slate-100 transition hover:border-emerald-300/50 hover:bg-white/15 focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-300/30"
             href="/explorer"
           >
-            start exploring!!
+            Browse explorer
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.6"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="h-4 w-4"
+            >
+              <path d="M5 12h14" />
+              <path d="M13 6l6 6-6 6" />
+            </svg>
           </Link>
-        </h2>
+        </div>
       )}
+
       {posts.length > 0 &&
-        posts.map((post) => (
+        posts.map((post, index) => (
           <Post
             key={post.id}
             post={post}
             updatePosts={updatePosts}
             handleToggleFavPostProps={handleToggleFavPost}
+            index={index}
           />
         ))}
-      <div className="fixed flex justify-center items-center bottom-18 w-full z-20">
+
+      <div className="fixed bottom-28 right-6 z-30 sm:bottom-32 sm:right-10">
         <button
           onClick={() =>
             openModal("create-post-modal", {
@@ -120,13 +141,26 @@ export default function AllPosts() {
               },
             })
           }
-          className="bg-color2 text-white p-2 px-4 rounded-3xl font-extrabold text-lg cursor-pointer transition duration-300 hover:bg-color1"
+          className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-emerald-300 via-teal-300 to-sky-300 px-6 py-3 text-sm font-semibold text-slate-900 shadow-lg transition hover:shadow-xl hover:brightness-110 focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-300/40"
         >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.6"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="h-4 w-4"
+          >
+            <path d="M12 5v14" />
+            <path d="M5 12h14" />
+          </svg>
           New Post
         </button>
       </div>
+
       {isPending && posts.length === 0 && (
-        <p className="text-center text-slate-500 mt-6">Loading feed…</p>
+        <p className="text-center text-sm text-slate-400">Loading feed…</p>
       )}
     </section>
   );

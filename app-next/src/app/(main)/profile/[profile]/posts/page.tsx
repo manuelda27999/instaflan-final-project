@@ -35,7 +35,6 @@ export default function ProfilePosts() {
       })
       .catch((error: unknown) => {
         const message = error instanceof Error ? error.message : String(error);
-        alert(message);
       });
   }, [userIdProfile]);
 
@@ -45,9 +44,7 @@ export default function ProfilePosts() {
         setPosts(posts);
       })
       .catch((error) => {
-        alert(
-          error instanceof Error ? error.message : String(error)
-        );
+        //alert(error instanceof Error ? error.message : String(error));
       });
   };
 
@@ -81,23 +78,40 @@ export default function ProfilePosts() {
         .catch((error: unknown) => {
           const message =
             error instanceof Error ? error.message : String(error);
-          alert(message);
         });
     });
   }
 
   return (
-    <section className="">
-      {posts?.map((post) => (
+    <section className="space-y-8">
+      {posts.length === 0 && !isPending && (
+        <div className="rounded-3xl border border-white/10 bg-white/5 p-10 text-center shadow-[0_35px_120px_-70px_rgba(56,189,248,0.75)] backdrop-blur-xl">
+          <p className="text-xs uppercase tracking-[0.35em] text-slate-300">
+            Nothing shared yet
+          </p>
+          <h2 className="mt-4 text-2xl font-semibold text-white">
+            No posts available
+          </h2>
+          <p className="mt-3 text-sm text-slate-300">
+            When this profile publishes a new post, it will appear right here.
+          </p>
+        </div>
+      )}
+
+      {posts.map((post, index) => (
         <Post
           key={post.id}
           post={post}
           updatePosts={updatePosts}
           handleToggleFavPostProps={handletoggleFavPost}
+          index={index}
         />
       ))}
+
       {isPending && posts.length === 0 && (
-        <p className="text-center text-slate-500 mt-4">Loading posts…</p>
+        <p className="mt-4 text-center text-sm text-slate-400">
+          Loading posts…
+        </p>
       )}
     </section>
   );

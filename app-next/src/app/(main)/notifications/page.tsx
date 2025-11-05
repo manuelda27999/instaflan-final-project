@@ -33,7 +33,6 @@ export default function Notifications() {
       .then((notifications) => setNotifications(notifications))
       .catch((error: unknown) => {
         const message = error instanceof Error ? error.message : String(error);
-        alert(message);
       });
   }, []);
 
@@ -56,7 +55,6 @@ export default function Notifications() {
         .catch((error: unknown) => {
           const message =
             error instanceof Error ? error.message : String(error);
-          alert(message);
         });
     });
   };
@@ -68,116 +66,131 @@ export default function Notifications() {
         .catch((error: unknown) => {
           const message =
             error instanceof Error ? error.message : String(error);
-          alert(message);
         });
     });
   };
 
   return (
-    <section className="flex flex-col items-center pb-20 w-full">
-      {notifications?.length === 0 && (
-        <h2 className="text-gray-500 mt-6 text-xl font-bold">
-          Notifications empty
-        </h2>
-      )}
-      {notifications?.map((notification) => (
-        <article key={notification.id} className="w-full">
-          {notification.text === "Follow" && (
-            <div className="flex items-center p-1 border-b-gray-400 border-b-2">
-              <ProfileImage
-                name={notification.user.name}
-                image={notification.user.image}
-              />
-              <a
-                onClick={(event) => handleProfile(event, notification.user.id)}
-                className="text-center m-2 text-color2 font-semibold ml-3"
-                href=""
+    <section className="space-y-6 pb-16">
+      {notifications.length === 0 ? (
+        <div className="rounded-3xl border border-white/10 bg-white/5 p-10 text-center shadow-[0_40px_120px_-70px_rgba(56,189,248,0.7)] backdrop-blur-xl">
+          <p className="text-xs uppercase tracking-[0.4em] text-slate-300">
+            All quiet
+          </p>
+          <h2 className="mt-4 text-2xl font-semibold text-white">
+            No notifications yet
+          </h2>
+          <p className="mt-3 text-sm text-slate-300">
+            Engage with the community to start seeing likes, follows, and
+            comments appear here.
+          </p>
+        </div>
+      ) : (
+        <>
+          <div className="space-y-4">
+            {notifications.map((notification) => {
+              const isFollow = notification.text === "Follow";
+              const isLike = notification.text === "Like";
+              const isComment = notification.text === "Comment";
+
+              return (
+                <article
+                  key={notification.id}
+                  className="flex items-center gap-4 rounded-3xl border border-white/10 bg-white/5 px-4 py-4 shadow-[0_20px_70px_-50px_rgba(56,189,248,0.6)] backdrop-blur-xl transition hover:border-emerald-300/40 hover:bg-white/10 sm:px-6"
+                >
+                  <ProfileImage
+                    name={notification.user.name}
+                    image={notification.user.image}
+                    size="sm"
+                  />
+                  <div className="flex-1">
+                    <button
+                      onClick={(event) =>
+                        handleProfile(event, notification.user.id)
+                      }
+                      className="text-sm font-semibold text-white transition hover:text-emerald-200"
+                    >
+                      {notification.user.name}
+                    </button>
+                    <p className="text-xs text-slate-300 sm:text-sm">
+                      {isFollow && "started following you."}
+                      {isLike && "reacted to your post."}
+                      {isComment && "commented on your post."}
+                    </p>
+
+                    {notification.post && (isLike || isComment) && (
+                      <div className="mt-3 inline-flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 p-2">
+                        <Image
+                          unoptimized
+                          width={64}
+                          height={64}
+                          className="h-12 w-12 rounded-xl object-cover"
+                          src={
+                            notification.post.image ||
+                            "/images/image-not-available.webp"
+                          }
+                          alt="Post preview"
+                          onError={(event) => {
+                            const target = event.target as HTMLImageElement;
+                            target.src = "/images/image-not-available.webp";
+                          }}
+                        />
+                        <span className="rounded-full bg-emerald-400/15 px-3 py-1 text-xs font-medium uppercase tracking-[0.3em] text-emerald-200">
+                          Spotlight
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  <button
+                    onClick={() => handleDeleteNotification(notification.id)}
+                    className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-slate-200 transition hover:border-rose-300/50 hover:bg-rose-400/10 hover:text-rose-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-300/40"
+                    aria-label="Delete notification"
+                  >
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.6"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="h-4 w-4"
+                    >
+                      <path d="M5 7h14" />
+                      <path d="M10 11v6" />
+                      <path d="M14 11v6" />
+                      <path d="M6 7l1 12a1.5 1.5 0 001.5 1.5h7a1.5 1.5 0 001.5-1.5l1-12" />
+                      <path d="M9 7V5.5A1.5 1.5 0 0110.5 4h3A1.5 1.5 0 0115 5.5V7" />
+                    </svg>
+                  </button>
+                </article>
+              );
+            })}
+          </div>
+
+          <div className="flex justify-center pt-4">
+            <button
+              onClick={handleDeleteAllNotifications}
+              disabled={isPending}
+              className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-6 py-3 text-sm font-semibold uppercase tracking-[0.35em] text-slate-100 transition hover:border-rose-300/50 hover:bg-rose-400/10 hover:text-rose-100 focus:outline-none focus-visible:ring-4 focus-visible:ring-rose-300/30 disabled:cursor-not-allowed disabled:opacity-70"
+            >
+              {isPending ? "Cleaning…" : "Clear all"}
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="h-4 w-4"
               >
-                {notification.user.name}
-              </a>
-              <p>follow you </p>
-              <button
-                onClick={() => handleDeleteNotification(notification.id)}
-                className="ml-auto rounded-lg hover:bg-color4 hover:scale-110 "
-              >
-                🗑️
-              </button>
-            </div>
-          )}
-          {notification.text === "Like" && notification.post && (
-            <div className="flex items-center p-1 border-b-gray-400 border-b-2">
-              <ProfileImage
-                name={notification.user.name}
-                image={notification.user.image}
-              />
-              <a
-                onClick={(event) => handleProfile(event, notification.user.id)}
-                className="text-center m-2 text-color2 font-semibold ml-3"
-                href=""
-              >
-                {notification.user.name}
-              </a>
-              <p>like your post</p>
-              <div className="flex flex-col ml-4 items-center border-3">
-                <Image
-                  unoptimized
-                  width={48}
-                  height={48}
-                  className="w-14 object-contain"
-                  src={notification.post.image}
-                  alt=""
-                />
-              </div>
-              <button
-                onClick={() => handleDeleteNotification(notification.id)}
-                className="ml-auto rounded-lg hover:bg-color4 hover:scale-110 "
-              >
-                🗑️
-              </button>
-            </div>
-          )}
-          {notification.text === "Comment" && notification.post && (
-            <div className="flex items-center p-1 border-b-gray-400 border-b-2">
-              <ProfileImage
-                name={notification.user.name}
-                image={notification.user.image}
-              />
-              <a
-                onClick={(event) => handleProfile(event, notification.user.id)}
-                className="text-center m-2 text-color2 font-semibold ml-3"
-                href=""
-              >
-                {notification.user.name}
-              </a>
-              <p>comment your post</p>
-              <div className="flex flex-col ml-4 items-center border-3">
-                <Image
-                  unoptimized
-                  width={48}
-                  height={48}
-                  className="w-14 object-contain"
-                  src={notification.post.image}
-                  alt=""
-                />
-              </div>
-              <button
-                onClick={() => handleDeleteNotification(notification.id)}
-                className="ml-auto rounded-lg hover:bg-color4 hover:scale-110 "
-              >
-                🗑️
-              </button>
-            </div>
-          )}
-        </article>
-      ))}
-      {notifications?.length > 0 && (
-        <button
-          onClick={handleDeleteAllNotifications}
-          disabled={isPending}
-          className="mt-4 button w-32 bg-color4 text-white border-none rounded-xl m-1 px-3 py-1 font-bold text-lg cursor-pointer transition duration-300 hover:bg-color3"
-        >
-          {isPending ? "Cleaning..." : "Clean all"}
-        </button>
+                <path d="M4 7h16" />
+                <path d="M10 11v6" />
+                <path d="M14 11v6" />
+                <path d="M6 7l1 12a1.5 1.5 0 001.5 1.5h7A1.5 1.5 0 0017 19l1-12" />
+              </svg>
+            </button>
+          </div>
+        </>
       )}
     </section>
   );

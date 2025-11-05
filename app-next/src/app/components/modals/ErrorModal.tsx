@@ -7,13 +7,13 @@ interface ErrorModalProps {
 
 export default function ErrorModal(props: ErrorModalProps) {
   return (
-    <div className="fixed top-0 left-0 right-0 bottom-0 m-auto bg-black/50 w-full h-full z-30 flex flex-col items-center justify-center">
-      <div className="flex flex-col justify-center items-center p-6 bg-color5 border-solid border-black border-4 rounded-lg w-64">
-        <h3 className="font-bold text-xl text-color1 mb-4">Error</h3>
-        <p className="text-color1 font-extrabold mb-4">{props.message}</p>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 px-4 backdrop-blur-lg">
+      <div className="w-full max-w-sm space-y-5 rounded-3xl border border-white/10 bg-white/5 p-6 text-center shadow-[0_40px_120px_-60px_rgba(248,113,113,0.6)] backdrop-blur-xl sm:p-8">
+        <h3 className="text-2xl font-semibold text-white">Something broke</h3>
+        <p className="text-sm text-slate-200">{props.message}</p>
         <button
           onClick={props.onClose}
-          className="bg-color4 text-white border-none rounded-xl px-3 py-1 font-bold text-lg cursor-pointer transition duration-300 hover:bg-color3"
+          className="inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-emerald-300 via-teal-300 to-sky-300 px-6 py-2 text-sm font-semibold uppercase tracking-[0.3em] text-slate-900 shadow-lg transition hover:shadow-xl hover:brightness-110"
         >
           Close
         </button>

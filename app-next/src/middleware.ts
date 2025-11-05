@@ -1,7 +1,13 @@
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
-const protedtedPaths = ["/home", "/profile", "/create-post"];
+const protedtedPaths = [
+  "/home",
+  "/profile",
+  "/messages",
+  "/explorer",
+  "/notifications",
+];
 const publicPaths = ["/login", "/register", "/"];
 
 export default async function middleware(req: NextRequest) {

@@ -1,6 +1,5 @@
 import { useEffect, useState, useTransition } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import Image from "next/image";
 
 import toggleFollowUser from "@/lib/api/toggleFollowUser";
 import retrieveFollowing from "@/lib/api/retrieveFollowing";
@@ -35,12 +34,11 @@ export default function FollowingModal(props: FollowedModalProps) {
       })
       .catch((error: unknown) => {
         const message = error instanceof Error ? error.message : String(error);
-        alert(message);
       });
   }, [userIdProfile]);
 
   const handleProfile = (
-    event: React.MouseEvent<HTMLAnchorElement>,
+    event: React.MouseEvent<HTMLElement>,
     userIdProfile: string
   ) => {
     event.preventDefault();
@@ -76,57 +74,63 @@ export default function FollowingModal(props: FollowedModalProps) {
         .catch((error: unknown) => {
           const message =
             error instanceof Error ? error.message : String(error);
-          alert(message);
         });
     });
   }
 
   return (
-    <div className="fixed top-0 left-0 right-0 bottom-0 m-auto bg-black/60 w-full h-full z-10 flex flex-col items-center justify-center">
-      <div className="flex flex-col justify-center items-center p-4 bg-color5 border-solid border-black border-4 rounded-lg w-5/6">
-        {users?.length === 0 ? (
-          <div className="flex flex-col justify-center items-center">
-            <p className="text-color2">Zero following</p>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 px-4 backdrop-blur-lg">
+      <div className="w-full max-w-md space-y-6 rounded-3xl border border-white/10 bg-white/5 p-8 shadow-[0_35px_120px_-60px_rgba(56,189,248,0.75)] backdrop-blur-xl">
+        <header className="text-center">
+          <p className="text-xs uppercase tracking-[0.4em] text-slate-300">
+            Your circle
+          </p>
+          <h3 className="mt-2 text-2xl font-semibold text-white">Following</h3>
+        </header>
+
+        {users.length === 0 ? (
+          <div className="rounded-2xl border border-white/10 bg-white/5 px-6 py-10 text-center text-sm text-slate-300">
+            Not following anyone yet. Explore creators to start building your
+            feed!
           </div>
         ) : (
-          <div className="flex flex-col justify-center items-center w-full">
-            <h3 className="text-2xl font-bold text-color1 mb-4">Following</h3>
-            {users?.map((user) => (
-              <article key={user.id} className="flex w-full">
-                <div className="flex justify-between items-center w-full bg-white m-1 p-1 px-2 rounded-2xl">
-                  <div className="flex flex-start items-center">
-                    <ProfileImage name={user.name} image={user.image} />
-                    <a
-                      onClick={(event) => handleProfile(event, user.id)}
-                      className="font-semibold text-color1 text-lg cursor-pointer"
-                    >
-                      {user.name}
-                    </a>
-                  </div>
-                  {currentUserId === userIdProfile && (
-                    <button
-                      onClick={() => handleFollowUser(user.id)}
-                      disabled={isPending}
-                      className="button bg-color4 text-white border-none rounded-xl px-3 py-1 ml-4 font-bold text-lg cursor-pointer transition duration-300 hover:bg-color3 edit-profile-button"
-                    >
-                      {isPending
-                        ? "Updating..."
-                        : user?.follow
-                        ? "Unfollow"
-                        : "Follow"}
-                    </button>
-                  )}
-                </div>
-              </article>
+          <div className="max-h-72 space-y-3 overflow-y-auto pr-2">
+            {users.map((user) => (
+              <div
+                key={user.id}
+                className="flex items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/5 px-3 py-3 transition hover:border-emerald-300/40 hover:bg-white/10"
+              >
+                <button
+                  onClick={(event) => handleProfile(event, user.id)}
+                  className="flex flex-1 items-center gap-3 text-left text-sm font-semibold text-white"
+                >
+                  <ProfileImage name={user.name} image={user.image} size="sm" />
+                  <span>{user.name}</span>
+                </button>
+                {currentUserId === userIdProfile && (
+                  <button
+                    onClick={() => handleFollowUser(user.id)}
+                    disabled={isPending}
+                    className="inline-flex items-center justify-center rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-slate-100 transition hover:border-emerald-300/40 hover:bg-white/15 focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-300/30 disabled:cursor-not-allowed disabled:opacity-70"
+                  >
+                    {isPending
+                      ? "Updating…"
+                      : user?.follow
+                      ? "Unfollow"
+                      : "Follow"}
+                  </button>
+                )}
+              </div>
             ))}
           </div>
         )}
+
         <button
           onClick={handleCancelFollowingModal}
           type="button"
-          className="bg-color4 text-white border-none rounded-xl px-3 py-1 mt-3 font-bold text-xl cursor-pointer transition duration-300 hover:bg-color3"
+          className="inline-flex w-full items-center justify-center rounded-full border border-white/15 bg-white/10 px-6 py-2 text-sm font-semibold uppercase tracking-[0.3em] text-slate-100 transition hover:border-emerald-300/40 hover:bg-white/15 focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-300/30"
         >
-          Back
+          Close
         </button>
       </div>
     </div>

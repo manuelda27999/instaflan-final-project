@@ -26,6 +26,16 @@
     }
 }
 
+@layer base {
+    button {
+        @apply cursor-pointer;
+    }
+
+    button:disabled {
+        @apply cursor-not-allowed;
+    }
+}
+
 @layer utilities {
     .animate-float {
         animation: float 14s ease-in-out infinite;

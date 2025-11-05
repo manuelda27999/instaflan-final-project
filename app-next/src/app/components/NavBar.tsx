@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 
 import retrieveUser from "@/lib/api/retrieveUser";
 import retrieveChats from "@/lib/api/retrieveChats";
@@ -20,6 +21,7 @@ interface Chat {
 }
 
 export default function NavBar() {
+  const pathname = usePathname();
   const [userIdProfile, setUserIdProfile] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [messagesNotReading, setMessagesNotReading] = useState<number>(0);
@@ -43,7 +45,6 @@ export default function NavBar() {
         .catch((error: unknown) => {
           const message =
             error instanceof Error ? error.message : String(error);
-          alert(message);
         });
     };
 
@@ -57,7 +58,7 @@ export default function NavBar() {
       })
       .catch((error: unknown) => {
         const message = error instanceof Error ? error.message : String(error);
-        alert(message);
+        alert(`Error retrieving user data: ${message}`);
       });
 
     const interval = setInterval(() => fetchChats(currentUserId), 5000);
@@ -68,58 +69,173 @@ export default function NavBar() {
     };
   }, []);
 
-  return (
-    <nav className="w-full h-16 bg-color5 fixed z-10 bottom-0 left-0 flex justify-around items-center">
-      <Link
-        className="text-white text-2xl mx-2 no-underline border-b-2 border-transparent transition-transform duration-200 hover:scale-125"
-        href="/home"
-      >
-        🏠
-      </Link>
-      <Link
-        className="text-white text-2xl mx-2 no-underline border-b-2 border-transparent transition-transform duration-200 hover:scale-125"
-        href="/explorer"
-      >
-        🌍
-      </Link>
-      <div className="flex justify-end">
-        {messagesNotReading > 0 && (
-          <div className="fixed z-10 rounded-full text-sm font-bold text-white bg-red-600 w-4 h-4 text-center flex justify-center items-center mr-1">
-            {messagesNotReading}
-          </div>
-        )}
-        <Link
-          className="text-white text-2xl mx-2 no-underline border-b-2 border-transparent transition-transform duration-200 hover:scale-125"
-          href="/messages"
+  const profileHref = useMemo(
+    () => (userIdProfile ? `/profile/${userIdProfile}/posts` : "#"),
+    [userIdProfile]
+  );
+
+  const navItems = [
+    {
+      label: "Home",
+      href: "/home",
+      isActive: (path: string) => path === "/home",
+      icon: (active: boolean) => (
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.6"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className={active ? "h-5 w-5 text-emerald-200" : "h-5 w-5 text-white"}
         >
-          ✉️
-        </Link>
-      </div>
-      <Link
-        className="text-white text-2xl mx-2 no-underline border-b-2 border-transparent transition-transform duration-200 hover:scale-125"
-        href="/notifications"
-      >
-        ❤️
-      </Link>
-      <Link
-        className="text-white text-2xl mx-2 no-underline border-b-2 border-transparent transition-transform duration-200 hover:scale-125"
-        href={`/profile/${userIdProfile}/posts`}
-      >
-        {user && (
+          <path d="M3.5 10.5L12 4l8.5 6.5" />
+          <path d="M5 10.5V19a1.5 1.5 0 001.5 1.5H17.5A1.5 1.5 0 0019 19v-8.5" />
+          <path d="M9.5 21V14h5v7" />
+        </svg>
+      ),
+    },
+    {
+      label: "Explore",
+      href: "/explorer",
+      isActive: (path: string) => path.startsWith("/explorer"),
+      icon: (active: boolean) => (
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.6"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className={active ? "h-5 w-5 text-emerald-200" : "h-5 w-5 text-white"}
+        >
+          <circle cx="12" cy="12" r="8.5" />
+          <path d="M9.5 14.5l1.5-4.5 4.5-1.5-1.5 4.5-4.5 1.5z" />
+        </svg>
+      ),
+    },
+    {
+      label: "Messages",
+      href: "/messages",
+      isActive: (path: string) => path.startsWith("/messages"),
+      icon: (active: boolean) => (
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.6"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className={active ? "h-5 w-5 text-emerald-200" : "h-5 w-5 text-white"}
+        >
+          <path d="M4.5 5h15a1.5 1.5 0 011.5 1.5v9a1.5 1.5 0 01-1.5 1.5h-6.3L12 20.5l-1.2-3H4.5A1.5 1.5 0 013 15.5v-9A1.5 1.5 0 014.5 5z" />
+          <path d="M6 8.5l6 3.5 6-3.5" />
+        </svg>
+      ),
+    },
+    {
+      label: "Activity",
+      href: "/notifications",
+      isActive: (path: string) => path.startsWith("/notifications"),
+      icon: (active: boolean) => (
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.6"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className={active ? "h-5 w-5 text-emerald-200" : "h-5 w-5 text-white"}
+        >
+          <path d="M12 19.5l-6.16-6.16a4.25 4.25 0 010-6 4.25 4.25 0 016 0l.16.16.16-.16a4.25 4.25 0 016 6L12 19.5z" />
+        </svg>
+      ),
+    },
+    {
+      label: "Profile",
+      href: profileHref,
+      isActive: (path: string) => path.startsWith("/profile"),
+      icon: (active: boolean) =>
+        user ? (
           <Image
             unoptimized
             width={40}
             height={40}
-            className="w-10 h-10 rounded-full mr-2 object-cover mb-px hover:scale-110"
-            src={
-              user.image
-                ? user.image
-                : "https://imgs.search.brave.com/jLOzY9Dtq7uH7I2DkMqETsipUhW25GINawy7rLyCLNY/rs:fit:860:0:0/g:ce/aHR0cHM6Ly9pbWcu/ZnJlZXBpay5jb20v/ZnJlZS1pY29uL3Vz/ZXJfMzE4LTE1OTcx/MS5qcGc_c2l6ZT02/MjYmZXh0PWpwZw"
-            }
+            className={`rounded-xl object-cover ${
+              active ? "ring-2 ring-emerald-300/60" : "ring-1 ring-white/10"
+            }`}
+            src={user.image ? user.image : "/images/default-profile.webp"}
             alt={user.name}
+            onError={(event) => {
+              const target = event.target as HTMLImageElement;
+              target.src = "/images/default-profile.webp";
+            }}
           />
-        )}
-      </Link>
+        ) : (
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.6"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className={
+              active ? "h-5 w-5 text-emerald-200" : "h-5 w-5 text-white"
+            }
+          >
+            <circle cx="12" cy="8" r="3.5" />
+            <path d="M5.5 19.5a6.5 6.5 0 0113 0" />
+          </svg>
+        ),
+    },
+  ];
+
+  return (
+    <nav className="fixed inset-x-0 bottom-0 z-40 px-4 pb-4 sm:px-6">
+      <div className="mx-auto max-w-5xl rounded-3xl border border-white/10 bg-slate-900/70 px-3 py-3 shadow-[0_-35px_120px_-70px_rgba(56,189,248,0.65)] backdrop-blur-xl">
+        <ul className="flex items-center justify-between gap-2">
+          {navItems.map((item) => {
+            const active = item.isActive(pathname);
+            const baseClasses =
+              "relative flex flex-1 items-center justify-center gap-2 rounded-2xl px-3 py-2 text-xs font-medium transition";
+            const stateClasses = active
+              ? "bg-white/10 text-white shadow-inner shadow-emerald-500/20"
+              : "text-slate-300 hover:bg-white/5 hover:text-white";
+
+            const disabled = item.label === "Profile" && profileHref === "#";
+
+            return (
+              <li key={item.label} className="flex flex-1 justify-center">
+                <Link
+                  href={item.href}
+                  className={`${baseClasses} ${stateClasses} ${
+                    disabled ? "pointer-events-none opacity-60" : ""
+                  }`}
+                  prefetch={item.label !== "Profile" || Boolean(userIdProfile)}
+                >
+                  {item.label === "Messages" && messagesNotReading > 0 && (
+                    <span className="absolute -top-1 right-3 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-emerald-400 px-1 text-[0.65rem] font-semibold text-slate-900 shadow-lg">
+                      {messagesNotReading > 9 ? "9+" : messagesNotReading}
+                    </span>
+                  )}
+                  <div
+                    className={`flex h-10 w-10 items-center justify-center rounded-xl border ${
+                      active
+                        ? "border-emerald-300/50 bg-gradient-to-br from-emerald-300/20 via-teal-300/20 to-sky-300/20"
+                        : "border-white/10 bg-white/5"
+                    }`}
+                  >
+                    {item.icon(active)}
+                  </div>
+                  <span className="hidden text-[0.7rem] tracking-wide sm:inline">
+                    {item.label}
+                  </span>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
     </nav>
   );
 }

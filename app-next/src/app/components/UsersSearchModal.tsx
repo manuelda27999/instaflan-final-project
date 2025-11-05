@@ -54,55 +54,70 @@ export default function UsersSearchModal() {
           .catch((error: unknown) => {
             const message =
               error instanceof Error ? error.message : String(error);
-            alert(message);
           });
       });
     }, 500);
   };
 
   return (
-    <div
-      className="flex flex-col items-center justify-center mr-3"
-      ref={containerRef}
-    >
-      <input
-        onChange={handleSearchUsers}
-        onFocus={() => setUsersList(true)}
-        className="h-8 w-40 rounded-3xl pl-2 border-2 border-color2 focus:border-black bg-white"
-        type="text"
-        placeholder="search..."
-      />
+    <div className="relative flex items-center justify-end" ref={containerRef}>
+      <div className="relative w-44 sm:w-56">
+        <span className="pointer-events-none absolute left-3 top-1/2 flex h-5 w-5 -translate-y-1/2 items-center justify-center text-slate-300/80">
+          <svg
+            aria-hidden
+            className="h-4 w-4"
+            viewBox="0 0 20 20"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+          >
+            <circle cx="9" cy="9" r="5.5" />
+            <line x1="13.5" y1="13.5" x2="17" y2="17" strokeLinecap="round" />
+          </svg>
+        </span>
+        <input
+          onChange={handleSearchUsers}
+          onFocus={() => setUsersList(true)}
+          className="w-full rounded-full border border-white/15 bg-white/10 pl-9 pr-3 py-2 text-sm text-slate-100 placeholder:text-slate-400 transition focus:border-emerald-300/50 focus:outline-none focus:ring-4 focus:ring-emerald-300/20"
+          type="text"
+          placeholder="Search creators"
+        />
+      </div>
 
       {usersList && (
-        <div className="absolute top-14 flex flex-col items-center mr-2">
-          <div className="modal-peak"></div>
+        <div className="absolute right-0 top-[calc(100%+0.75rem)] z-50 w-72 space-y-2 rounded-2xl border border-white/10 bg-slate-900/85 p-3 shadow-[0_30px_70px_-35px_rgba(15,23,42,0.9)] backdrop-blur-2xl">
           {isSearching ? (
-            <div className="bg-white flex flex-col items-center justify-center rounded-xl px-4 py-2">
-              <p className="font-semibold text-color1 text-base">
-                Searching...
-              </p>
+            <div className="flex items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 py-6">
+              <p className="text-sm font-medium text-slate-200">Searching…</p>
             </div>
           ) : users?.length > 0 ? (
-            <div className="bg-white flex flex-col items-center justify-center rounded-xl">
-              {users?.map((user) => (
-                <article className="px-2 py-1" key={user.id}>
-                  <div className="flex items-center">
-                    <ProfileImage name={user.name} image={user.image} />
-                    <Link
-                      href={`/profile/${user.id}/posts`}
-                      className="font-semibold text-color1 text-lg cursor-pointer"
-                    >
-                      {user.name}
-                    </Link>
-                  </div>
-                </article>
-              ))}
-            </div>
+            users.map((user) => (
+              <Link
+                key={user.id}
+                href={`/profile/${user.id}/posts`}
+                className="group flex items-center gap-3 rounded-xl border border-transparent bg-white/5 px-3 py-2 text-sm font-medium text-slate-100 transition hover:border-emerald-300/40 hover:bg-white/10"
+                onClick={() => setUsersList(false)}
+              >
+                <ProfileImage name={user.name} image={user.image} size="sm" />
+                <span className="flex-1">{user.name}</span>
+                <span className="text-xs uppercase tracking-[0.3em] text-emerald-200/70 opacity-0 transition group-hover:opacity-100">
+                  View
+                </span>
+              </Link>
+            ))
           ) : (
-            <div className="bg-white flex flex-col items-center justify-center rounded-xl">
-              <article className="px-2 py-1">
-                <h2 className="font-semibold text-color1 text-lg">Not found</h2>
-              </article>
+            <div className="flex flex-col items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-6 text-center">
+              <Image
+                unoptimized
+                width={48}
+                height={48}
+                className="h-12 w-12 opacity-70"
+                src="/images/flan.png"
+                alt="Flan mascot"
+              />
+              <p className="text-sm font-medium text-slate-200">
+                No matching creators yet.
+              </p>
             </div>
           )}
         </div>

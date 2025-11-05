@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
-import Image from "next/image";
+import Link from "next/link";
+
 import retrieveChats from "@/lib/api/retrieveChats";
 import retrieveUser from "@/lib/api/retrieveUser";
 import ProfileImage from "@/app/components/ProfileImage";
@@ -26,7 +26,6 @@ export default function Messages() {
   const [chats, setChats] = useState<Chat[]>([]);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
-  const router = useRouter();
 
   useEffect(() => {
     let active = true;
@@ -41,7 +40,6 @@ export default function Messages() {
         .catch((error: unknown) => {
           const message =
             error instanceof Error ? error.message : String(error);
-          alert(message);
         });
     });
 
@@ -50,56 +48,95 @@ export default function Messages() {
     };
   }, []);
 
-  const handleNavigateChat = (
-    event: React.MouseEvent<HTMLAnchorElement>,
-    chatId: string
-  ) => {
-    event.preventDefault();
-    router.push(`/messages/${chatId}`);
-  };
-
   return (
-    <section className="flex flex-col items-center pb-20 w-full">
-      {chats?.length === 0 && (
-        <h2 className="text-gray-500 mt-6 text-xl font-bold">Messages empty</h2>
+    <section className="space-y-6 pb-20">
+      {chats.length === 0 ? (
+        <div className="rounded-3xl border border-white/10 bg-white/5 p-10 text-center shadow-[0_40px_120px_-70px_rgba(56,189,248,0.7)] backdrop-blur-xl">
+          <p className="text-xs uppercase tracking-[0.35em] text-slate-300">
+            Inbox is clear
+          </p>
+          <h2 className="mt-4 text-2xl font-semibold text-white">
+            No conversations yet
+          </h2>
+          <p className="mt-3 text-sm text-slate-300">
+            Start chatting by visiting profiles and sending a direct message.
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {chats.map((chat) => {
+            const hasUnread =
+              Boolean(currentUserId) &&
+              chat.unreadFor?.includes(currentUserId as string);
+            const lastMessage = chat.messages[chat.messages.length - 1];
+            const displayUsers = chat.users.filter(
+              (user) => user.id !== currentUserId
+            );
+            const avatars = displayUsers.length > 0 ? displayUsers : chat.users;
+
+            return (
+              <Link
+                key={chat.id}
+                href={`/messages/${chat.id}`}
+                className={`group flex items-center justify-between gap-4 rounded-3xl border px-4 py-4 shadow-[0_25px_70px_-60px_rgba(56,189,248,0.7)] backdrop-blur-xl transition sm:px-6 ${
+                  hasUnread
+                    ? "border-emerald-300/50 bg-emerald-400/10 text-white"
+                    : "border-white/10 bg-white/5 text-slate-100 hover:border-emerald-300/40 hover:bg-white/10"
+                }`}
+              >
+                <div className="flex items-center gap-4">
+                  <div className="flex -space-x-3">
+                    {avatars.slice(0, 3).map((user) => (
+                      <ProfileImage
+                        key={user.id}
+                        name={user.name}
+                        image={user.image}
+                        size="sm"
+                        className="border border-white/10 bg-slate-950/40 first:ml-0"
+                      />
+                    ))}
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold sm:text-base">
+                      {avatars.map((user) => user.name).join(", ")}
+                    </p>
+                    <p
+                      className={`mt-1 text-xs sm:text-sm ${
+                        hasUnread ? "text-emerald-100" : "text-slate-300"
+                      }`}
+                    >
+                      {isPending
+                        ? "Loading…"
+                        : lastMessage?.text || "No messages yet"}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  {hasUnread && (
+                    <span className="rounded-full bg-emerald-400/20 px-3 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-emerald-100">
+                      New
+                    </span>
+                  )}
+                  <span className="hidden items-center justify-center rounded-2xl border border-white/10 bg-white/5 p-2 text-slate-300 transition group-hover:border-emerald-300/40 group-hover:bg-emerald-400/10 group-hover:text-emerald-200 sm:inline-flex">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.6"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="h-4 w-4"
+                    >
+                      <path d="M5 12h14" />
+                      <path d="M13 6l6 6-6 6" />
+                    </svg>
+                  </span>
+                </div>
+              </Link>
+            );
+          })}
+        </div>
       )}
-      {chats?.length > 0 &&
-        chats?.map((chat) => (
-          <a
-            onClick={(event) => handleNavigateChat(event, chat.id)}
-            key={chat.id}
-            className={
-              currentUserId && chat.unreadFor?.includes(currentUserId)
-                ? "w-full flex flex-col border-b-2 bg-slate-200  border-b-gray-400 p-1 hover:bg-gray-300 cursor-pointer"
-                : "w-full flex flex-col border-b-2  border-b-gray-400 p-1 hover:bg-gray-300 cursor-pointer"
-            }
-          >
-            <div className="flex flex-col gap-1">
-              {chat.users.map((user) => (
-                <article
-                  key={user.id}
-                  className="flex justify-start items-center pl-3"
-                >
-                  <ProfileImage name={user.name} image={user.image} />
-                  <p className="m-2 text-color1 font-semibold ml-3">
-                    {user.name}
-                  </p>
-                </article>
-              ))}
-            </div>
-            <p
-              className={
-                currentUserId && chat.unreadFor?.includes(currentUserId)
-                  ? "m-2 ml-3 mb-0 font-bold"
-                  : "m-2 ml-3 mb-0"
-              }
-            >
-              {isPending
-                ? "Loading..."
-                : chat.messages[chat.messages.length - 1]?.text}
-            </p>
-          </a>
-        ))}
     </section>
   );
 }
