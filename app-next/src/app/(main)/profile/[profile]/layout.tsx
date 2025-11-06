@@ -101,16 +101,12 @@ export default function ProfileLayout({
         <div className="relative z-10 flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
             {userProfile && (
-              <ProfileImage
-                name={userProfile.name}
-                image={userProfile.image}
-                size="lg"
-              />
+              <ProfileImage name={userProfile.name} image={userProfile.image} />
             )}
             <div>
-              <h1 className="text-2xl font-semibold text-white sm:text-3xl">
+              <h2 className="text-2xl font-semibold text-white sm:text-3xl">
                 {userProfile?.name}
-              </h1>
+              </h2>
               <p className="mt-2 max-w-xl text-sm text-slate-300 sm:text-base">
                 {userProfile?.description || "No bio yet – time to add one!"}
               </p>

@@ -98,9 +98,6 @@ export default function Post(props: PostProps) {
               >
                 {post.author.name}
               </Link>
-              <p className="text-xs text-slate-400">
-                Sharing a flantastic moment
-              </p>
             </div>
           </div>
 
