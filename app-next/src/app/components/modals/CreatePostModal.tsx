@@ -15,14 +15,7 @@ interface CreatePostModalProps {
 
 export default function CreatePostModal(props: CreatePostModalProps) {
   const [isPending, startTransition] = useTransition();
-  const [resource, setResource] = useState<
-    string | CloudinaryUploadWidgetInfo | undefined
-  >(undefined);
-
-  const uploadedImageUrl =
-    typeof resource === "string"
-      ? resource
-      : (resource as CloudinaryUploadWidgetInfo | undefined)?.secure_url ?? "";
+  const [uploadedImageUrl, setUploadedImageUrl] = useState<string>("");
 
   const handleSubmitPost = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -112,7 +105,14 @@ export default function CreatePostModal(props: CreatePostModalProps) {
             <CldUploadWidget
               signatureEndpoint="/api/sign-cloudinary-params"
               onSuccess={(result, { widget }) => {
-                setResource(result?.info);
+                if (
+                  typeof result.info !== "string" &&
+                  result?.info?.secure_url
+                ) {
+                  setUploadedImageUrl(result?.info.secure_url);
+                } else {
+                  console.error("Upload failed: No secure_url found.");
+                }
               }}
               onQueuesEnd={(result, { widget }) => {
                 widget.close();

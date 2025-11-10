@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 
 import retrieveUser from "@/lib/api/retrieveUser";
 import retrieveChats from "@/lib/api/retrieveChats";
+import ProfileImage from "./ProfileImage";
 
 interface User {
   id: string;
@@ -156,37 +157,7 @@ export default function NavBar() {
       href: profileHref,
       isActive: (path: string) => path.startsWith("/profile"),
       icon: (active: boolean) =>
-        user ? (
-          <Image
-            unoptimized
-            width={40}
-            height={40}
-            className={`rounded-xl object-cover ${
-              active ? "ring-2 ring-emerald-300/60" : "ring-1 ring-white/10"
-            }`}
-            src={user.image ? user.image : "/images/default-profile.webp"}
-            alt={user.name}
-            onError={(event) => {
-              const target = event.target as HTMLImageElement;
-              target.src = "/images/default-profile.webp";
-            }}
-          />
-        ) : (
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.6"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className={
-              active ? "h-5 w-5 text-emerald-200" : "h-5 w-5 text-white"
-            }
-          >
-            <circle cx="12" cy="8" r="3.5" />
-            <path d="M5.5 19.5a6.5 6.5 0 0113 0" />
-          </svg>
-        ),
+        user && <ProfileImage name={user.name} image={user.image} />,
     },
   ];
 
@@ -219,7 +190,7 @@ export default function NavBar() {
                     </span>
                   )}
                   <div
-                    className={`flex h-10 w-10 items-center justify-center rounded-xl border ${
+                    className={`flex h-10 w-10 min-h-10 min-w-10 items-center justify-center rounded-xl border overflow-hidden ${
                       active
                         ? "border-emerald-300/50 bg-gradient-to-br from-emerald-300/20 via-teal-300/20 to-sky-300/20"
                         : "border-white/10 bg-white/5"

@@ -9,6 +9,7 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "media.licdn.com" },
       { protocol: "https", hostname: "res.cloudinary.com" },
     ],
+    qualities: [100, 90, 75, 50, 30],
   },
 };
 

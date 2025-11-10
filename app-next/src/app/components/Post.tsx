@@ -85,16 +85,17 @@ export default function Post(props: PostProps) {
       <div className="pointer-events-none absolute inset-x-8 top-0 h-32 rounded-full bg-emerald-300/10 blur-3xl" />
       <div className="relative z-10">
         <header className="flex items-center justify-between px-6 pt-6">
-          <div className="flex items-center gap-4">
-            <ProfileImage
-              name={post.author.name}
-              image={post.author.image}
-              size="md"
-            />
-            <div>
+          <div className="flex items-center gap-4 min-w-0">
+            <Link
+              href={`/profile/${post.author.id}/posts`}
+              className="h-12 w-12 rounded-full overflow-hidden border border-emerald-300/50 shadow-[0_0_30px_-12px_rgba(52,211,153,0.8)]"
+            >
+              <ProfileImage name={post.author.name} image={post.author.image} />
+            </Link>
+            <div className="min-w-0">
               <Link
                 href={`/profile/${post.author.id}/posts`}
-                className="text-sm font-semibold text-white transition hover:text-emerald-200"
+                className="text-lg font-bold text-white transition hover:text-emerald-200 truncate"
               >
                 {post.author.name}
               </Link>
@@ -195,12 +196,16 @@ export default function Post(props: PostProps) {
                 Comments
               </p>
               {post.comments.map((comment) => (
-                <article className="flex items-start gap-3" key={comment.id}>
-                  <ProfileImage
-                    name={comment.author.name}
-                    image={comment.author.image}
-                    size="xs"
-                  />
+                <article className="flex items-center gap-3" key={comment.id}>
+                  <Link
+                    href={`/profile/${post.author.id}/posts`}
+                    className="h-8 w-8 rounded-full overflow-hidden border border-emerald-300/50 shadow-[0_0_30px_-12px_rgba(52,211,153,0.8)]"
+                  >
+                    <ProfileImage
+                      name={post.author.name}
+                      image={post.author.image}
+                    />
+                  </Link>
                   <div className="flex-1">
                     <Link
                       className="text-xs font-semibold uppercase tracking-[0.25em] text-emerald-200 transition hover:text-emerald-100"

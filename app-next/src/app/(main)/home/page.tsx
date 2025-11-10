@@ -131,7 +131,7 @@ export default function AllPosts() {
           />
         ))}
 
-      <div className="fixed bottom-28 right-6 z-30 sm:bottom-32 sm:right-10">
+      <div className="fixed bottom-20 right-[10vw] z-30 sm:bottom-32 sm:right-10">
         <button
           onClick={() =>
             openModal("create-post-modal", {

@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect, useTransition } from "react";
+import Image from "next/image";
+import { CldUploadWidget } from "next-cloudinary";
 import retrievePost from "@/lib/api/retrievePost";
 import editPost from "@/lib/api/editPost";
 
@@ -18,11 +20,21 @@ interface Post {
 
 export default function EditPostModal(props: EditPostModalProps) {
   const [post, setPost] = useState<Post | null>(null);
+
+  const [uploadedImageUrl, setUploadedImageUrl] = useState<string>(
+    post?.image || ""
+  );
+
+  console.log("Uploaded Image URL:", uploadedImageUrl);
+
   const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
     retrievePost(props.postId)
-      .then((post) => setPost(post))
+      .then((post) => {
+        setPost(post);
+        setUploadedImageUrl(post.image);
+      })
       .catch((error: unknown) => {
         const message = error instanceof Error ? error.message : String(error);
       });
@@ -32,7 +44,7 @@ export default function EditPostModal(props: EditPostModalProps) {
     event.preventDefault();
 
     const form = event.target as HTMLFormElement;
-    const image = (form.elements.namedItem("image") as HTMLInputElement).value;
+    const image = uploadedImageUrl.trim();
     const text = (form.elements.namedItem("text") as HTMLInputElement).value;
 
     startTransition(() => {
@@ -73,17 +85,59 @@ export default function EditPostModal(props: EditPostModalProps) {
               htmlFor="image"
               className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-300"
             >
-              Image URL
+              Image
             </label>
-            <input
-              id="image"
-              name="image"
-              type="url"
-              defaultValue={post.image || ""}
-              className="w-full rounded-2xl border border-white/15 bg-white/10 px-4 py-3 text-sm text-slate-100 placeholder:text-slate-400 focus:border-emerald-300/50 focus:outline-none focus:ring-4 focus:ring-emerald-300/20"
-              placeholder="https://your-image-link.jpg"
-              required
-            />
+            <div className="flex flex-col items-center gap-4 rounded-2xl border border-white/10 bg-slate-900/40 p-4 text-center">
+              {uploadedImageUrl ? (
+                <div className="overflow-hidden rounded-2xl border border-white/10 bg-black/20">
+                  <Image
+                    src={uploadedImageUrl}
+                    alt="Post preview"
+                    width={320}
+                    height={320}
+                    className="h-48 w-full object-cover"
+                  />
+                </div>
+              ) : (
+                <p className="text-sm text-slate-300">
+                  No image selected yet. Upload one.
+                </p>
+              )}
+
+              <CldUploadWidget
+                signatureEndpoint="/api/sign-cloudinary-params"
+                onSuccess={(result, { widget }) => {
+                  if (
+                    typeof result.info !== "string" &&
+                    result?.info?.secure_url
+                  ) {
+                    setUploadedImageUrl(result?.info.secure_url);
+                  } else {
+                    console.error("Upload failed: No secure_url found.");
+                  }
+                }}
+                onQueuesEnd={(result, { widget }) => {
+                  widget.close();
+                }}
+              >
+                {({ open }) => {
+                  function handleOnClick(
+                    event: React.MouseEvent<HTMLButtonElement>
+                  ) {
+                    event.preventDefault();
+                    open();
+                  }
+                  return (
+                    <button
+                      onClick={handleOnClick}
+                      className="inline-flex items-center justify-center gap-2 rounded-full border border-white/15 bg-white/10 px-6 py-2 text-sm font-semibold uppercase tracking-[0.3em] text-slate-100 transition hover:border-emerald-300/40 hover:bg-white/15 focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-300/30 cursor-pointer"
+                    >
+                      Upload from device
+                    </button>
+                  );
+                }}
+              </CldUploadWidget>
+            </div>
           </div>
 
           <div className="space-y-3">

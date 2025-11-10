@@ -3,10 +3,7 @@
 import { useState, useTransition } from "react";
 import Image from "next/image";
 import editUser from "@/lib/api/editUser";
-import {
-  CldUploadWidget,
-  type CloudinaryUploadWidgetInfo,
-} from "next-cloudinary";
+import { CldUploadWidget } from "next-cloudinary";
 
 interface User {
   name: string;
@@ -23,14 +20,9 @@ interface EditUserModalProps {
 export default function EditUserModal(props: EditUserModalProps) {
   const user = props.user;
   const [isPending, startTransition] = useTransition();
-  const [resource, setResource] = useState<
-    string | CloudinaryUploadWidgetInfo | undefined
-  >(user.image);
-
-  const uploadedImageUrl =
-    typeof resource === "string"
-      ? resource
-      : (resource as CloudinaryUploadWidgetInfo | undefined)?.secure_url ?? "";
+  const [uploadedImageUrl, setUploadedImageUrl] = useState<string>(
+    user?.image || ""
+  );
 
   const handleSubmitUser = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -57,7 +49,7 @@ export default function EditUserModal(props: EditUserModalProps) {
   const handleCancelEditUser = () => props.onHideEditUser();
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 px-4 backdrop-blur-lg">
+    <div className="fixed z-50 top-0 left-0 w-screen h-screen flex items-center justify-center bg-slate-950/80 px-4 backdrop-blur-lg">
       {user && (
         <form
           onSubmit={handleSubmitUser}
@@ -111,14 +103,21 @@ export default function EditUserModal(props: EditUserModalProps) {
                 </div>
               ) : (
                 <p className="text-sm text-slate-300">
-                  No image selected yet. Upload one or paste a URL above.
+                  No image selected yet. Upload one.
                 </p>
               )}
 
               <CldUploadWidget
                 signatureEndpoint="/api/sign-cloudinary-params"
                 onSuccess={(result, { widget }) => {
-                  setResource(result?.info);
+                  if (
+                    typeof result.info !== "string" &&
+                    result?.info?.secure_url
+                  ) {
+                    setUploadedImageUrl(result?.info.secure_url);
+                  } else {
+                    console.error("Upload failed: No secure_url found.");
+                  }
                 }}
                 onQueuesEnd={(result, { widget }) => {
                   widget.close();
@@ -156,7 +155,7 @@ export default function EditUserModal(props: EditUserModalProps) {
               name="description"
               rows={4}
               defaultValue={user.description || ""}
-              className="w-full rounded-2xl border border-white/15 bg-white/10 px-4 py-3 text-sm text-slate-100 placeholder:text-slate-400 focus:border-emerald-300/50 focus:outline-none focus:ring-4 focus:ring-emerald-300/20"
+              className="w-full max-h-28 rounded-2xl border border-white/15 bg-white/10 px-4 py-3 text-sm text-slate-100 placeholder:text-slate-400 focus:border-emerald-300/50 focus:outline-none focus:ring-4 focus:ring-emerald-300/20"
               placeholder="Share your sweetest story…"
               required
             />

@@ -101,7 +101,12 @@ export default function ProfileLayout({
         <div className="relative z-10 flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
             {userProfile && (
-              <ProfileImage name={userProfile.name} image={userProfile.image} />
+              <span className="w-22 h-22 min-w-22 min-h-22 rounded-full overflow-hidden border border-emerald-300/50 shadow-[0_0_30px_-12px_rgba(52,211,153,0.8)]">
+                <ProfileImage
+                  name={userProfile.name}
+                  image={userProfile.image}
+                />
+              </span>
             )}
             <div>
               <h2 className="text-2xl font-semibold text-white sm:text-3xl">
