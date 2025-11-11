@@ -113,6 +113,7 @@ export default function Chat() {
 
   const participants =
     chat?.users.filter((user) => user.id !== currentUserId) ?? [];
+
   const displayParticipants =
     participants.length > 0 ? participants : chat?.users ?? [];
 
@@ -123,13 +124,13 @@ export default function Chat() {
           <div className="flex items-center gap-4">
             <div className="flex -space-x-3">
               {displayParticipants.slice(0, 3).map((participant) => (
-                <ProfileImage
-                  key={participant.id}
-                  name={participant.name}
-                  image={participant.image}
-                  size="sm"
-                  className="border border-white/10 bg-slate-950/40 first:ml-0"
-                />
+                <span className="h-14 w-14 rounded-full overflow-hidden border border-emerald-300/50 shadow-[0_0_30px_-12px_rgba(52,211,153,0.8)]">
+                  <ProfileImage
+                    key={participant.id}
+                    name={participant.name}
+                    image={participant.image}
+                  />
+                </span>
               ))}
             </div>
             <div>
@@ -164,7 +165,7 @@ export default function Chat() {
         </div>
       </div>
 
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-2">
         {chat?.messages.map((message) => {
           const isOwn = currentUserId && message.author === currentUserId;
           const author =
@@ -176,7 +177,11 @@ export default function Chat() {
                 key={message.id}
                 className="flex justify-center text-xs italic text-slate-400"
               >
-                <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1">
+                <span
+                  className={`rounded-full border border-white/10 bg-white/5 px-3 py-1 ${
+                    isOwn ? "ml-auto" : "mr-auto"
+                  }`}
+                >
                   Message deleted
                 </span>
               </article>
@@ -195,54 +200,56 @@ export default function Chat() {
                   isOwn ? "flex-row-reverse" : "flex-row"
                 }`}
               >
-                {!isOwn && author && (
-                  <ProfileImage
-                    name={author.name}
-                    image={author.image}
-                    size="xs"
-                    className="border border-white/10 bg-slate-950/40"
-                  />
-                )}
+                {/* {!isOwn && author && (
+                  <span className="h-8 w-8 rounded-full overflow-hidden border border-emerald-300/50 shadow-[0_0_30px_-12px_rgba(52,211,153,0.8)]">
+                    <ProfileImage name={author.name} image={author.image} />
+                  </span>
+                )} */}
                 <div
-                  className={`rounded-3xl border px-4 py-3 text-sm shadow-[0_25px_70px_-55px_rgba(56,189,248,0.8)] ${
+                  className={`flex flex-col rounded-3xl border px-3 py-2 text-sm shadow-[0_25px_70px_-55px_rgba(56,189,248,0.8)] ${
                     isOwn
                       ? "border-emerald-300/60 bg-gradient-to-r from-emerald-300/20 via-teal-300/20 to-sky-300/25 text-emerald-50"
                       : "border-white/10 bg-white/5 text-slate-100"
                   }`}
                 >
-                  <p className="whitespace-pre-wrap break-words">
-                    {message.text}
-                  </p>
-                  <div className="mt-2 flex items-center justify-between gap-3">
-                    {message.edit && (
-                      <span className="text-[0.65rem] uppercase tracking-[0.3em] text-slate-300/80">
-                        Edited
-                      </span>
-                    )}
-                    {isOwn && (
-                      <button
-                        onClick={() =>
-                          openModal("edit-delete-message", { message })
-                        }
-                        className="ml-auto inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/15 bg-white/10 text-slate-200 transition hover:border-emerald-300/45 hover:bg-emerald-400/10 hover:text-emerald-100"
-                        type="button"
-                        aria-label="Edit or delete message"
-                      >
-                        <svg
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="1.6"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          className="h-4 w-4"
+                  <div className="flex flex-row">
+                    <div className="flex justify-center items-center">
+                      <p className="whitespace-pre-wrap break-words ">
+                        {message.text}
+                      </p>
+                    </div>
+
+                    <div className="flex items-center justify-between gap-3">
+                      {isOwn && !message.edit && (
+                        <button
+                          onClick={() =>
+                            openModal("edit-delete-message", { message })
+                          }
+                          className="ml-2 inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/15 bg-white/10 text-slate-200 transition hover:border-emerald-300/45 hover:bg-emerald-400/10 hover:text-emerald-100"
+                          type="button"
+                          aria-label="Edit or delete message"
                         >
-                          <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z" />
-                          <path d="M14.06 7.19l3.75 3.75" />
-                        </svg>
-                      </button>
-                    )}
+                          <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1.6"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className="h-4 w-4"
+                          >
+                            <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z" />
+                            <path d="M14.06 7.19l3.75 3.75" />
+                          </svg>
+                        </button>
+                      )}
+                    </div>
                   </div>
+                  {message.edit && (
+                    <span className="text-[0.65rem] uppercase tracking-[0.3em] text-slate-300/80 ml-auto mt-2">
+                      Edited
+                    </span>
+                  )}
                 </div>
               </div>
             </article>
