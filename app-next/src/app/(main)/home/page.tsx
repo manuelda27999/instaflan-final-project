@@ -49,10 +49,6 @@ export default function AllPosts() {
     loadPosts();
   }, [loadPosts]);
 
-  const updatePosts = useCallback(() => {
-    loadPosts();
-  }, [loadPosts]);
-
   function handleToggleFavPost(postId: string) {
     startTransition(() => {
       toggleFavPost(postId)
@@ -125,7 +121,7 @@ export default function AllPosts() {
           <Post
             key={post.id}
             post={post}
-            updatePosts={updatePosts}
+            updatePosts={loadPosts}
             handleToggleFavPostProps={handleToggleFavPost}
             index={index}
           />
@@ -136,7 +132,7 @@ export default function AllPosts() {
           onClick={() =>
             openModal("create-post-modal", {
               callback: (close: () => void) => {
-                updatePosts();
+                loadPosts();
                 close();
               },
             })

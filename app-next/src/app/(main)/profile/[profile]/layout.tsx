@@ -95,7 +95,7 @@ export default function ProfileLayout({
   const followingCount = userProfile?.following?.length ?? 0;
 
   return (
-    <section className="space-y-8 pb-20">
+    <section className="space-y-8">
       <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 px-5 py-6 shadow-[0_35px_120px_-70px_rgba(56,189,248,0.75)] backdrop-blur-xl sm:px-8 sm:py-8">
         <div className="pointer-events-none absolute inset-x-10 top-0 h-40 rounded-full bg-emerald-300/10 blur-3xl" />
         <div className="relative z-10 flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">

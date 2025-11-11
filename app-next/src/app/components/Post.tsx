@@ -198,12 +198,12 @@ export default function Post(props: PostProps) {
               {post.comments.map((comment) => (
                 <article className="flex items-center gap-3" key={comment.id}>
                   <Link
-                    href={`/profile/${post.author.id}/posts`}
+                    href={`/profile/${comment.author.id}/posts`}
                     className="h-8 w-8 rounded-full overflow-hidden border border-emerald-300/50 shadow-[0_0_30px_-12px_rgba(52,211,153,0.8)]"
                   >
                     <ProfileImage
-                      name={post.author.name}
-                      image={post.author.image}
+                      name={comment.author.name}
+                      image={comment.author.image}
                     />
                   </Link>
                   <div className="flex-1">
