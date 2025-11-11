@@ -8,6 +8,7 @@ import deleteNotification from "@/lib/api/deleteNotification";
 import deleteAllNotifications from "@/lib/api/deleteAllNotifications";
 import retrieveNotifications from "@/lib/api/retrieveNotifications";
 import ProfileImage from "@/app/components/ProfileImage";
+import Link from "next/link";
 
 interface Notification {
   id: string;
@@ -39,14 +40,6 @@ export default function Notifications() {
   useEffect(() => {
     loadNotifications();
   }, [loadNotifications]);
-
-  const handleProfile = (
-    event: React.MouseEvent<HTMLAnchorElement>,
-    userIdProfile: string
-  ) => {
-    event.preventDefault();
-    router.push(`/profile/${userIdProfile}/posts`);
-  };
 
   const handleDeleteNotification = (notificationId: string) => {
     startTransition(() => {
@@ -96,35 +89,40 @@ export default function Notifications() {
               return (
                 <article
                   key={notification.id}
-                  className="flex items-center gap-4 rounded-3xl border border-white/10 bg-white/5 px-4 py-4 shadow-[0_20px_70px_-50px_rgba(56,189,248,0.6)] backdrop-blur-xl transition hover:border-emerald-300/40 hover:bg-white/10 sm:px-6"
+                  className="flex items-center gap-4 rounded-3xl border border-white/10 bg-white/5 px-4 py-3 shadow-[0_20px_70px_-50px_rgba(56,189,248,0.6)] backdrop-blur-xl transition hover:border-emerald-300/40 hover:bg-white/10 sm:px-6"
                 >
-                  <ProfileImage
-                    name={notification.user.name}
-                    image={notification.user.image}
-                    size="sm"
-                  />
-                  <div className="flex-1">
-                    <button
-                      onClick={(event) =>
-                        handleProfile(event, notification.user.id)
-                      }
-                      className="text-sm font-semibold text-white transition hover:text-emerald-200"
-                    >
-                      {notification.user.name}
-                    </button>
-                    <p className="text-xs text-slate-300 sm:text-sm">
-                      {isFollow && "started following you."}
-                      {isLike && "reacted to your post."}
-                      {isComment && "commented on your post."}
-                    </p>
+                  <Link
+                    href={`/profile/${notification.user.id}/posts`}
+                    className="h-16 w-16 rounded-full overflow-hidden border border-emerald-300/50 shadow-[0_0_30px_-12px_rgba(52,211,153,0.8)]"
+                  >
+                    <ProfileImage
+                      name={notification.user.name}
+                      image={notification.user.image}
+                    />
+                  </Link>
+
+                  <div className="flex flex-row items-center justify-between flex-1 min-w-0 gap-4">
+                    <div>
+                      <Link
+                        href={`/profile/${notification.user.id}/posts`}
+                        className="text-sm font-semibold text-white transition hover:text-emerald-200"
+                      >
+                        {notification.user.name}
+                      </Link>
+                      <p className="text-xs text-slate-300 sm:text-sm">
+                        {isFollow && "started following you."}
+                        {isLike && "liked your post."}
+                        {isComment && "commented on your post."}
+                      </p>
+                    </div>
 
                     {notification.post && (isLike || isComment) && (
-                      <div className="mt-3 inline-flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 p-2">
+                      <div className="inline-flex items-center rounded-2xl border border-white/10 bg-white/5 p-1">
                         <Image
                           unoptimized
-                          width={64}
-                          height={64}
-                          className="h-12 w-12 rounded-xl object-cover"
+                          width={120}
+                          height={120}
+                          className="h-18 w-auto rounded-xl"
                           src={
                             notification.post.image ||
                             "/images/image-not-available.webp"
@@ -135,9 +133,6 @@ export default function Notifications() {
                             target.src = "/images/image-not-available.webp";
                           }}
                         />
-                        <span className="rounded-full bg-emerald-400/15 px-3 py-1 text-xs font-medium uppercase tracking-[0.3em] text-emerald-200">
-                          Spotlight
-                        </span>
                       </div>
                     )}
                   </div>

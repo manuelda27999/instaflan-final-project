@@ -14,10 +14,10 @@ interface User {
 
 export default function UsersSearchModal() {
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const [textState, setTextState] = useState<string>("");
   const [users, setUsers] = useState<User[]>([]);
   const [usersList, setUsersList] = useState<boolean>(false);
   const [isSearching, startTransition] = useTransition();
-  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -35,19 +35,19 @@ export default function UsersSearchModal() {
     };
   }, []);
 
-  const handleSearchUsers = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSearchUsers = (event: any) => {
     const text = event.target.value;
-
-    if (searchTimeoutRef.current) {
-      clearTimeout(searchTimeoutRef.current);
-    }
 
     if (!text) {
       setUsers([]);
       return;
     }
 
-    searchTimeoutRef.current = setTimeout(() => {
+    if (isSearching || text === textState) {
+      return;
+    } else {
+      setTextState(text);
+
       startTransition(() => {
         searchUser(text)
           .then((foundUsers) => setUsers(foundUsers))
@@ -56,7 +56,7 @@ export default function UsersSearchModal() {
               error instanceof Error ? error.message : String(error);
           });
       });
-    }, 500);
+    }
   };
 
   return (
@@ -98,7 +98,9 @@ export default function UsersSearchModal() {
                 className="group flex items-center gap-3 rounded-xl border border-transparent bg-white/5 px-3 py-2 text-sm font-medium text-slate-100 transition hover:border-emerald-300/40 hover:bg-white/10"
                 onClick={() => setUsersList(false)}
               >
-                <ProfileImage name={user.name} image={user.image} size="sm" />
+                <div className="h-12 w-12 rounded-full overflow-hidden border border-emerald-300/50 shadow-[0_0_30px_-12px_rgba(52,211,153,0.8)]">
+                  <ProfileImage name={user.name} image={user.image} />
+                </div>
                 <span className="flex-1">{user.name}</span>
                 <span className="text-xs uppercase tracking-[0.3em] text-emerald-200/70 opacity-0 transition group-hover:opacity-100">
                   View

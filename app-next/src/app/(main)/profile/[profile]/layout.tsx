@@ -38,6 +38,8 @@ export default function ProfileLayout({
   const [userProfile, setUserProfile] = useState<User | null>(null);
   const [isPending, startTransition] = useTransition();
 
+  console.log(userProfile);
+
   const updateUser = useCallback(() => {
     retrieveUserById(userIdProfile)
       .then((profile) => {

@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 
 import retrieveUser from "@/lib/api/retrieveUser";
@@ -61,13 +60,6 @@ export default function NavBar() {
         const message = error instanceof Error ? error.message : String(error);
         alert(`Error retrieving user data: ${message}`);
       });
-
-    const interval = setInterval(() => fetchChats(currentUserId), 5000);
-
-    return () => {
-      active = false;
-      clearInterval(interval);
-    };
   }, []);
 
   const profileHref = useMemo(
