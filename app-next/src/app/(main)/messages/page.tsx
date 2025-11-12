@@ -87,7 +87,10 @@ export default function Messages() {
                 <div className="flex items-center gap-4">
                   <div className="flex -space-x-3">
                     {avatars.slice(0, 3).map((user) => (
-                      <span className="h-12 w-12 rounded-full overflow-hidden border border-emerald-300/50 shadow-[0_0_30px_-12px_rgba(52,211,153,0.8)]">
+                      <span
+                        key={user.id}
+                        className="h-12 w-12 rounded-full overflow-hidden border border-emerald-300/50 shadow-[0_0_30px_-12px_rgba(52,211,153,0.8)]"
+                      >
                         <ProfileImage
                           key={user.id}
                           name={user.name}

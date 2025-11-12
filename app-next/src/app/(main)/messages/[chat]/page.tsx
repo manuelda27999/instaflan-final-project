@@ -118,13 +118,16 @@ export default function Chat() {
     participants.length > 0 ? participants : chat?.users ?? [];
 
   return (
-    <section className="relative flex flex-col pb-36">
-      <div className="mb-6 rounded-3xl border border-white/10 bg-white/5 px-4 py-4 shadow-[0_35px_120px_-70px_rgba(56,189,248,0.75)] backdrop-blur-xl sm:px-6 sm:py-5">
+    <section className="relative flex flex-col items-center pb-18">
+      <div className="fixed w-5/6 max-w-4xl rounded-3xl border border-white/10 bg-white/5 px-4 py-3 shadow-[0_35px_120px_-70px_rgba(56,189,248,0.75)] backdrop-blur-xl sm:px-6">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <div className="flex -space-x-3">
               {displayParticipants.slice(0, 3).map((participant) => (
-                <span className="h-14 w-14 rounded-full overflow-hidden border border-emerald-300/50 shadow-[0_0_30px_-12px_rgba(52,211,153,0.8)]">
+                <span
+                  key={participant.id}
+                  className="h-14 w-14 rounded-full overflow-hidden border border-emerald-300/50 shadow-[0_0_30px_-12px_rgba(52,211,153,0.8)]"
+                >
                   <ProfileImage
                     key={participant.id}
                     name={participant.name}
@@ -165,11 +168,9 @@ export default function Chat() {
         </div>
       </div>
 
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2 mt-24 max-w-4xl">
         {chat?.messages.map((message) => {
           const isOwn = currentUserId && message.author === currentUserId;
-          const author =
-            chat?.users.find((user) => user.id === message.author) || null;
 
           if (message.delete) {
             return (
@@ -225,7 +226,7 @@ export default function Chat() {
                           onClick={() =>
                             openModal("edit-delete-message", { message })
                           }
-                          className="ml-2 inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/15 bg-white/10 text-slate-200 transition hover:border-emerald-300/45 hover:bg-emerald-400/10 hover:text-emerald-100"
+                          className="ml-2 mr-[-4] mb-auto inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/15 bg-white/10 text-slate-200 transition hover:border-emerald-300/45 hover:bg-emerald-400/10 hover:text-emerald-100"
                           type="button"
                           aria-label="Edit or delete message"
                         >
@@ -261,7 +262,7 @@ export default function Chat() {
         onSubmit={handleSendMessage}
         className="fixed inset-x-0 bottom-28 z-40 px-4 sm:px-6"
       >
-        <div className="mx-auto flex w-full max-w-4xl items-center gap-3 rounded-3xl border border-white/10 bg-white/5 px-4 py-3 shadow-[0_30px_80px_-60px_rgba(56,189,248,0.7)] backdrop-blur-xl">
+        <div className="mx-auto flex w-5/6 max-w-4xl items-center gap-3 rounded-3xl border border-white/10 bg-white/5 px-4 py-3 shadow-[0_30px_80px_-60px_rgba(56,189,248,0.7)] backdrop-blur-xl">
           <input
             id="message"
             name="message"
