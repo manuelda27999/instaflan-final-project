@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import retrieveFollowed from "@/lib/api/retrieveFollowed";
 import { useRouter, usePathname } from "next/navigation";
 import ProfileImage from "../ProfileImage";
+import Link from "next/link";
 
 interface FollowedModalProps {
   onHideFollowedModal: () => void;
@@ -59,14 +60,20 @@ export default function FollowedModal(props: FollowedModalProps) {
         ) : (
           <div className="max-h-72 space-y-3 overflow-y-auto pr-2">
             {users.map((user) => (
-              <button
+              <div
                 key={user.id}
-                onClick={(event) => handleProfile(event, user.id)}
                 className="flex w-full items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-3 py-3 text-left text-sm font-semibold text-white transition hover:border-emerald-300/40 hover:bg-white/10"
               >
-                <ProfileImage name={user.name} image={user.image} size="sm" />
-                <span>{user.name}</span>
-              </button>
+                <span className="h-12 w-12 rounded-full overflow-hidden border border-emerald-300/50 shadow-[0_0_30px_-12px_rgba(52,211,153,0.8)]">
+                  <ProfileImage name={user.name} image={user.image} />
+                </span>
+                <Link
+                  className="font-semibold hover:text-emerald-300"
+                  href={`/profile/${user.id}/posts`}
+                >
+                  {user.name}
+                </Link>
+              </div>
             ))}
           </div>
         )}

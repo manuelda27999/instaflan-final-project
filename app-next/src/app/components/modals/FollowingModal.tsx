@@ -5,6 +5,7 @@ import toggleFollowUser from "@/lib/api/toggleFollowUser";
 import retrieveFollowing from "@/lib/api/retrieveFollowing";
 import retrieveUser from "@/lib/api/retrieveUser";
 import ProfileImage from "../ProfileImage";
+import Link from "next/link";
 
 interface FollowedModalProps {
   onHideFollowingModal: () => void;
@@ -36,15 +37,6 @@ export default function FollowingModal(props: FollowedModalProps) {
         const message = error instanceof Error ? error.message : String(error);
       });
   }, [userIdProfile]);
-
-  const handleProfile = (
-    event: React.MouseEvent<HTMLElement>,
-    userIdProfile: string
-  ) => {
-    event.preventDefault();
-    router.push(`/profile/${userIdProfile}/posts`);
-    props.onHideFollowingModal();
-  };
 
   const handleCancelFollowingModal = () => {
     props.onHideFollowingModal();
@@ -100,13 +92,17 @@ export default function FollowingModal(props: FollowedModalProps) {
                 key={user.id}
                 className="flex items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/5 px-3 py-3 transition hover:border-emerald-300/40 hover:bg-white/10"
               >
-                <button
-                  onClick={(event) => handleProfile(event, user.id)}
-                  className="flex flex-1 items-center gap-3 text-left text-sm font-semibold text-white"
-                >
-                  <ProfileImage name={user.name} image={user.image} size="sm" />
-                  <span>{user.name}</span>
-                </button>
+                <div className="flex flex-1 items-center gap-3 text-left text-sm font-semibold text-white">
+                  <span className="h-12 w-12 rounded-full overflow-hidden border border-emerald-300/50 shadow-[0_0_30px_-12px_rgba(52,211,153,0.8)]">
+                    <ProfileImage name={user.name} image={user.image} />
+                  </span>
+                  <Link
+                    className="font-semibold hover:text-emerald-300"
+                    href={`/profile/${user.id}/posts`}
+                  >
+                    {user.name}
+                  </Link>
+                </div>
                 {currentUserId === userIdProfile && (
                   <button
                     onClick={() => handleFollowUser(user.id)}

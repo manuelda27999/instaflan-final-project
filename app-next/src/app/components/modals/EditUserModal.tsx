@@ -53,12 +53,9 @@ export default function EditUserModal(props: EditUserModalProps) {
       {user && (
         <form
           onSubmit={handleSubmitUser}
-          className="w-full max-w-md space-y-6 rounded-3xl border border-white/10 bg-white/5 p-8 shadow-[0_40px_120px_-60px_rgba(56,189,248,0.8)] backdrop-blur-xl"
+          className="w-full max-w-md space-y-6 rounded-3xl border border-white/10 bg-white/5 px-8 py-4 shadow-[0_40px_120px_-60px_rgba(56,189,248,0.8)] backdrop-blur-xl"
         >
           <header className="space-y-2 text-center">
-            <p className="text-xs uppercase tracking-[0.4em] text-slate-300">
-              Personalize your profile
-            </p>
             <h3 className="text-2xl font-semibold text-white">Edit profile</h3>
             <p className="text-sm text-slate-300">
               Update your display name, avatar, and bio to reflect your vibe.

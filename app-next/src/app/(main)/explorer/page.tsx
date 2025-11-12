@@ -168,7 +168,7 @@ export default function Explorer() {
               <Link
                 href={`profile/${user.id}/posts`}
                 key={user.id}
-                className="flex items-center justify-between gap-4 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 transition hover:border-emerald-300/40 hover:bg-white/10"
+                className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 transition hover:border-emerald-300/40 hover:bg-white/10"
               >
                 <div className="flex items-center gap-3">
                   <span className="h-16 w-16 rounded-full overflow-hidden border border-emerald-300/50 shadow-[0_0_30px_-12px_rgba(52,211,153,0.8)]">

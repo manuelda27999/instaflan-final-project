@@ -80,6 +80,8 @@ export default function NavBar() {
           strokeWidth="1.6"
           strokeLinecap="round"
           strokeLinejoin="round"
+          aria-label="Home"
+          focusable="false"
           className={active ? "h-5 w-5 text-emerald-200" : "h-5 w-5 text-white"}
         >
           <path d="M3.5 10.5L12 4l8.5 6.5" />
@@ -100,6 +102,8 @@ export default function NavBar() {
           strokeWidth="1.6"
           strokeLinecap="round"
           strokeLinejoin="round"
+          aria-label="Explore"
+          focusable="false"
           className={active ? "h-5 w-5 text-emerald-200" : "h-5 w-5 text-white"}
         >
           <circle cx="12" cy="12" r="8.5" />
@@ -119,10 +123,12 @@ export default function NavBar() {
           strokeWidth="1.6"
           strokeLinecap="round"
           strokeLinejoin="round"
+          aria-label="Messages"
+          focusable="false"
           className={active ? "h-5 w-5 text-emerald-200" : "h-5 w-5 text-white"}
         >
-          <path d="M4.5 5h15a1.5 1.5 0 011.5 1.5v9a1.5 1.5 0 01-1.5 1.5h-6.3L12 20.5l-1.2-3H4.5A1.5 1.5 0 013 15.5v-9A1.5 1.5 0 014.5 5z" />
-          <path d="M6 8.5l6 3.5 6-3.5" />
+          <path d="M3.5 5.5h17a1 1 0 011 1v10a1 1 0 01-1 1h-17a1 1 0 01-1-1v-10a1 1 0 011-1z" />
+          <path d="M4.5 7.5l7.5 5 7.5-5" />
         </svg>
       ),
     },
@@ -138,6 +144,8 @@ export default function NavBar() {
           strokeWidth="1.6"
           strokeLinecap="round"
           strokeLinejoin="round"
+          aria-label="Activity"
+          focusable="false"
           className={active ? "h-5 w-5 text-emerald-200" : "h-5 w-5 text-white"}
         >
           <path d="M12 19.5l-6.16-6.16a4.25 4.25 0 010-6 4.25 4.25 0 016 0l.16.16.16-.16a4.25 4.25 0 016 6L12 19.5z" />
@@ -156,7 +164,7 @@ export default function NavBar() {
   return (
     <nav className="fixed inset-x-0 bottom-0 z-40 px-4 pb-4 sm:px-6">
       <div className="mx-auto max-w-5xl rounded-3xl border border-white/10 bg-slate-900/70 px-3 py-3 shadow-[0_-35px_120px_-70px_rgba(56,189,248,0.65)] backdrop-blur-xl">
-        <ul className="flex items-center justify-between gap-2">
+        <ul className="flex items-center justify-between">
           {navItems.map((item) => {
             const active = item.isActive(pathname);
             const baseClasses =
@@ -190,7 +198,7 @@ export default function NavBar() {
                   >
                     {item.icon(active)}
                   </div>
-                  <span className="hidden text-[0.7rem] tracking-wide sm:inline">
+                  <span className="hidden text-[0.7rem] tracking-wide md:inline">
                     {item.label}
                   </span>
                 </Link>

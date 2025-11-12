@@ -137,10 +137,13 @@ export default function Chat() {
               ))}
             </div>
             <div>
-              <h2 className="text-sm font-semibold text-white sm:text-base">
+              <Link
+                href={`/profile/${displayParticipants[0]?.id}/posts`}
+                className="text-sm font-semibold text-white sm:text-base hover:text-emerald-300"
+              >
                 {displayParticipants.map((user) => user.name).join(", ") ||
                   "Conversation"}
-              </h2>
+              </Link>
               <p className="text-xs text-slate-300">
                 {displayParticipants.length > 1
                   ? "Group chat"
@@ -149,14 +152,6 @@ export default function Chat() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            {displayParticipants.length > 0 && (
-              <Link
-                href={`/profile/${displayParticipants[0].id}/posts`}
-                className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-slate-100 transition hover:border-emerald-300/40 hover:bg-white/15 focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-300/30"
-              >
-                View profile
-              </Link>
-            )}
             <button
               onClick={() => router.back()}
               className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-slate-100 transition hover:border-emerald-300/40 hover:bg-white/15 focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-300/30"
@@ -168,7 +163,7 @@ export default function Chat() {
         </div>
       </div>
 
-      <div className="flex flex-col gap-2 mt-24 max-w-4xl">
+      <div className="flex flex-col gap-2 mt-24 w-full max-w-4xl">
         {chat?.messages.map((message) => {
           const isOwn = currentUserId && message.author === currentUserId;
 

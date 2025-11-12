@@ -83,7 +83,7 @@ export default function ProfileFavPosts() {
   }
 
   return (
-    <section className="space-y-8">
+    <section className="space-y-8 pb-6">
       {posts.length === 0 && !isPending && (
         <div className="rounded-3xl border border-white/10 bg-white/5 p-10 text-center shadow-[0_35px_120px_-70px_rgba(56,189,248,0.75)] backdrop-blur-xl">
           <p className="text-xs uppercase tracking-[0.35em] text-slate-300">
