@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import retrieveFollowed from "@/lib/api/retrieveFollowed";
-import { useRouter, usePathname } from "next/navigation";
+import { usePathname } from "next/navigation";
 import ProfileImage from "../ProfileImage";
+import { useModal } from "@/context/ModalContext";
 import Link from "next/link";
 
 interface FollowedModalProps {
@@ -17,7 +18,7 @@ interface User {
 
 export default function FollowedModal(props: FollowedModalProps) {
   const [users, setUsers] = useState<User[]>([]);
-  const router = useRouter();
+  const { openModal } = useModal();
 
   const pathname = usePathname();
   const userIdProfile = pathname.split("/")[2];
@@ -27,17 +28,9 @@ export default function FollowedModal(props: FollowedModalProps) {
       .then((users) => setUsers(users))
       .catch((error: unknown) => {
         const message = error instanceof Error ? error.message : String(error);
+        openModal("error-modal", { message });
       });
-  }, [userIdProfile]);
-
-  const handleProfile = (
-    event: React.MouseEvent<HTMLElement>,
-    userIdProfile: string
-  ) => {
-    event.preventDefault();
-    router.push(`/profile/${userIdProfile}/posts`);
-    props.onHideFollowedModal();
-  };
+  }, [userIdProfile, openModal]);
 
   const handleCancelFollowedModal = () => {
     props.onHideFollowedModal();

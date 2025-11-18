@@ -50,6 +50,7 @@ export default function Chat() {
         .catch((error: unknown) => {
           const message =
             error instanceof Error ? error.message : String(error);
+          openModal("error-modal", { message });
         });
     });
 
@@ -64,6 +65,7 @@ export default function Chat() {
         .catch((error: unknown) => {
           const message =
             error instanceof Error ? error.message : String(error);
+          openModal("error-modal", { message });
         });
     }, 2000);
 
@@ -71,7 +73,7 @@ export default function Chat() {
       active = false;
       clearInterval(intervalId);
     };
-  }, [chatId]);
+  }, [chatId, openModal]);
 
   const handleSendMessage = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -98,6 +100,7 @@ export default function Chat() {
         .catch((error: unknown) => {
           const message =
             error instanceof Error ? error.message : String(error);
+          openModal("error-modal", { message });
         });
     });
   };

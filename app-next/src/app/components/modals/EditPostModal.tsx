@@ -5,6 +5,7 @@ import Image from "next/image";
 import { CldUploadWidget } from "next-cloudinary";
 import retrievePost from "@/lib/api/retrievePost";
 import editPost from "@/lib/api/editPost";
+import { useModal } from "@/context/ModalContext";
 
 interface EditPostModalProps {
   postId: string;
@@ -25,6 +26,8 @@ export default function EditPostModal(props: EditPostModalProps) {
     post?.image || ""
   );
 
+  const { openModal } = useModal();
+
   console.log("Uploaded Image URL:", uploadedImageUrl);
 
   const [isPending, startTransition] = useTransition();
@@ -37,8 +40,9 @@ export default function EditPostModal(props: EditPostModalProps) {
       })
       .catch((error: unknown) => {
         const message = error instanceof Error ? error.message : String(error);
+        openModal("error-modal", { message });
       });
-  }, [props.postId]);
+  }, [props.postId, openModal]);
 
   const handleSubmitPost = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -55,6 +59,7 @@ export default function EditPostModal(props: EditPostModalProps) {
         .catch((error: unknown) => {
           const message =
             error instanceof Error ? error.message : String(error);
+          openModal("error-modal", { message });
         });
     });
   };
@@ -106,7 +111,7 @@ export default function EditPostModal(props: EditPostModalProps) {
 
               <CldUploadWidget
                 signatureEndpoint="/api/sign-cloudinary-params"
-                onSuccess={(result, { widget }) => {
+                onSuccess={(result) => {
                   if (
                     typeof result.info !== "string" &&
                     result?.info?.secure_url

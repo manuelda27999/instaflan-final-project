@@ -3,10 +3,8 @@
 import { useState, useTransition } from "react";
 import Image from "next/image";
 import createNewPost from "@/lib/api/createNewPost";
-import {
-  CldUploadWidget,
-  type CloudinaryUploadWidgetInfo,
-} from "next-cloudinary";
+import { CldUploadWidget } from "next-cloudinary";
+import { useModal } from "@/context/ModalContext";
 
 interface CreatePostModalProps {
   onCreatePost: () => void;
@@ -16,6 +14,7 @@ interface CreatePostModalProps {
 export default function CreatePostModal(props: CreatePostModalProps) {
   const [isPending, startTransition] = useTransition();
   const [uploadedImageUrl, setUploadedImageUrl] = useState<string>("");
+  const { openModal } = useModal();
 
   const handleSubmitPost = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -25,7 +24,9 @@ export default function CreatePostModal(props: CreatePostModalProps) {
     const image = uploadedImageUrl.trim();
 
     if (!image) {
-      alert("Please upload or provide an image before publishing.");
+      openModal("error-modal", {
+        message: "Please provide an image before publishing.",
+      });
       return;
     }
 
@@ -37,7 +38,7 @@ export default function CreatePostModal(props: CreatePostModalProps) {
         .catch((error: unknown) => {
           const message =
             error instanceof Error ? error.message : String(error);
-          alert(message);
+          openModal("error-modal", { message });
         });
     });
   };
@@ -104,7 +105,7 @@ export default function CreatePostModal(props: CreatePostModalProps) {
 
             <CldUploadWidget
               signatureEndpoint="/api/sign-cloudinary-params"
-              onSuccess={(result, { widget }) => {
+              onSuccess={(result) => {
                 if (
                   typeof result.info !== "string" &&
                   result?.info?.secure_url

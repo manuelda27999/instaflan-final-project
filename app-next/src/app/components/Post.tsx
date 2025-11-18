@@ -55,14 +55,15 @@ export default function Post(props: PostProps) {
         if (!active) return;
         setCurrentUserId(user?.id ?? null);
       })
-      .catch((error: unknown) => {
-        const message = error instanceof Error ? error.message : String(error);
-      });
+        .catch((error: unknown) => {
+          const message = error instanceof Error ? error.message : String(error);
+          openModal("error-modal", { message });
+        });
 
     return () => {
       active = false;
     };
-  }, []);
+  }, [openModal]);
 
   function updateThisPost(updated: {
     id: string;

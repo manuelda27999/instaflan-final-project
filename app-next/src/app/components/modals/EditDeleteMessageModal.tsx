@@ -3,6 +3,7 @@
 import { useTransition } from "react";
 import deleteMessage from "@/lib/api/deleteMessage";
 import editMessage from "@/lib/api/editMessage";
+import { useModal } from "@/context/ModalContext";
 
 interface EditDeleteMessageModalProps {
   message: Message;
@@ -20,6 +21,7 @@ interface Message {
 export default function EditDeleteMessageModal(
   props: EditDeleteMessageModalProps
 ) {
+  const { openModal } = useModal();
   const message = props.message;
 
   const [isPending, startTransition] = useTransition();
@@ -38,6 +40,7 @@ export default function EditDeleteMessageModal(
         .catch((error: unknown) => {
           const message =
             error instanceof Error ? error.message : String(error);
+          openModal("error-modal", { message });
         });
     });
   };
@@ -51,6 +54,7 @@ export default function EditDeleteMessageModal(
         .catch((error: unknown) => {
           const message =
             error instanceof Error ? error.message : String(error);
+          openModal("error-modal", { message });
         });
     });
   };

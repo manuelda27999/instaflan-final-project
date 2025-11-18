@@ -47,8 +47,9 @@ export default function ProfileLayout({
       })
       .catch((error: unknown) => {
         const message = error instanceof Error ? error.message : String(error);
+        openModal("error-modal", { message });
       });
-  }, [userIdProfile]);
+  }, [userIdProfile, openModal]);
 
   useEffect(() => {
     let active = true;
@@ -61,12 +62,13 @@ export default function ProfileLayout({
       })
       .catch((error: unknown) => {
         const message = error instanceof Error ? error.message : String(error);
+        openModal("error-modal", { message });
       });
 
     return () => {
       active = false;
     };
-  }, [userIdProfile]);
+  }, [userIdProfile, openModal]);
 
   const handleFollowUser = () => {
     startTransition(() => {
@@ -76,6 +78,7 @@ export default function ProfileLayout({
         .catch((error: unknown) => {
           const message =
             error instanceof Error ? error.message : String(error);
+          openModal("error-modal", { message });
         });
     });
   };
@@ -89,6 +92,7 @@ export default function ProfileLayout({
         .catch((error: unknown) => {
           const message =
             error instanceof Error ? error.message : String(error);
+          openModal("error-modal", { message });
         });
     });
   };

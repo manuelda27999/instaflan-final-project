@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import Image from "next/image";
 import editUser from "@/lib/api/editUser";
 import { CldUploadWidget } from "next-cloudinary";
+import { useModal } from "@/context/ModalContext";
 
 interface User {
   name: string;
@@ -24,6 +25,8 @@ export default function EditUserModal(props: EditUserModalProps) {
     user?.image || ""
   );
 
+  const { openModal } = useModal();
+
   const handleSubmitUser = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -42,6 +45,7 @@ export default function EditUserModal(props: EditUserModalProps) {
         .catch((error: unknown) => {
           const message =
             error instanceof Error ? error.message : String(error);
+          openModal("error-modal", { message });
         });
     });
   };
@@ -106,7 +110,7 @@ export default function EditUserModal(props: EditUserModalProps) {
 
               <CldUploadWidget
                 signatureEndpoint="/api/sign-cloudinary-params"
-                onSuccess={(result, { widget }) => {
+                onSuccess={(result) => {
                   if (
                     typeof result.info !== "string" &&
                     result?.info?.secure_url

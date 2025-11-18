@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import retrieveUser from "@/lib/api/retrieveUser";
 import retrieveChats from "@/lib/api/retrieveChats";
 import ProfileImage from "./ProfileImage";
+import { useModal } from "@/context/ModalContext";
 
 interface User {
   id: string;
@@ -25,6 +26,7 @@ export default function NavBar() {
   const [userIdProfile, setUserIdProfile] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [messagesNotReading, setMessagesNotReading] = useState<number>(0);
+  const { openModal } = useModal();
 
   useEffect(() => {
     let active = true;
@@ -45,6 +47,7 @@ export default function NavBar() {
         .catch((error: unknown) => {
           const message =
             error instanceof Error ? error.message : String(error);
+          openModal("error-modal", { message });
         });
     };
 
@@ -58,9 +61,12 @@ export default function NavBar() {
       })
       .catch((error: unknown) => {
         const message = error instanceof Error ? error.message : String(error);
-        alert(`Error retrieving user data: ${message}`);
+        openModal("error-modal", { message });
       });
-  }, []);
+    return () => {
+      active = false;
+    };
+  }, [openModal]);
 
   const profileHref = useMemo(
     () => (userIdProfile ? `/profile/${userIdProfile}/posts` : "#"),
@@ -156,8 +162,7 @@ export default function NavBar() {
       label: "Profile",
       href: profileHref,
       isActive: (path: string) => path.startsWith("/profile"),
-      icon: (active: boolean) =>
-        user && <ProfileImage name={user.name} image={user.image} />,
+      icon: () => user && <ProfileImage name={user.name} image={user.image} />,
     },
   ];
 

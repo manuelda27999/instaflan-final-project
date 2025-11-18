@@ -1,11 +1,12 @@
 import { useEffect, useState, useTransition } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 import toggleFollowUser from "@/lib/api/toggleFollowUser";
 import retrieveFollowing from "@/lib/api/retrieveFollowing";
 import retrieveUser from "@/lib/api/retrieveUser";
 import ProfileImage from "../ProfileImage";
 import Link from "next/link";
+import { useModal } from "@/context/ModalContext";
 
 interface FollowedModalProps {
   onHideFollowingModal: () => void;
@@ -22,7 +23,8 @@ export default function FollowingModal(props: FollowedModalProps) {
   const [users, setUsers] = useState<User[]>([]);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
-  const router = useRouter();
+
+  const { openModal } = useModal();
 
   const pathname = usePathname();
   const userIdProfile = pathname.split("/")[2];
@@ -35,8 +37,9 @@ export default function FollowingModal(props: FollowedModalProps) {
       })
       .catch((error: unknown) => {
         const message = error instanceof Error ? error.message : String(error);
+        openModal("error-modal", { message });
       });
-  }, [userIdProfile]);
+  }, [userIdProfile, openModal]);
 
   const handleCancelFollowingModal = () => {
     props.onHideFollowingModal();
@@ -66,6 +69,7 @@ export default function FollowingModal(props: FollowedModalProps) {
         .catch((error: unknown) => {
           const message =
             error instanceof Error ? error.message : String(error);
+          openModal("error-modal", { message });
         });
     });
   }

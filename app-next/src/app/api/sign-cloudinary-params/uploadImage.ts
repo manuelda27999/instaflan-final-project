@@ -7,7 +7,7 @@ export async function uploadImage(imagePath: string): Promise<string> {
       transformation: [{ width: 1080, crop: "limit" }],
     });
     return result.secure_url;
-  } catch (error) {
+  } catch {
     throw new Error("Failed to upload image to Cloudinary.");
   }
 }

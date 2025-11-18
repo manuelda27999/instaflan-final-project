@@ -4,6 +4,7 @@ import { useEffect, useState, useTransition } from "react";
 import { usePathname } from "next/navigation";
 import retrieveFavPosts from "@/lib/api/retrieveFavPosts";
 import toggleFavPost from "@/lib/api/toggleFavPost";
+import { useModal } from "@/context/ModalContext";
 
 import Post from "@/app/components/Post";
 
@@ -27,6 +28,7 @@ export default function ProfileFavPosts() {
 
   const [posts, setPosts] = useState<Post[]>([]);
   const [isPending, startTransition] = useTransition();
+  const { openModal } = useModal();
 
   useEffect(() => {
     retrieveFavPosts(userIdProfile)
@@ -35,16 +37,18 @@ export default function ProfileFavPosts() {
       })
       .catch((error: unknown) => {
         const message = error instanceof Error ? error.message : String(error);
+        openModal("error-modal", { message });
       });
-  }, [userIdProfile]);
+  }, [userIdProfile, openModal]);
 
   const updatedPosts = () => {
     retrieveFavPosts(userIdProfile)
       .then((posts) => {
         setPosts(posts);
       })
-      .catch((error) => {
-        //alert(error instanceof Error ? error.message : String(error));
+      .catch((error: unknown) => {
+        const message = error instanceof Error ? error.message : String(error);
+        openModal("error-modal", { message });
       });
   };
 
@@ -78,6 +82,7 @@ export default function ProfileFavPosts() {
         .catch((error: unknown) => {
           const message =
             error instanceof Error ? error.message : String(error);
+          openModal("error-modal", { message });
         });
     });
   }

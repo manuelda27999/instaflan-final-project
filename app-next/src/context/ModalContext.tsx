@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useState, useContext, ReactNode } from "react";
+import { createContext, useState, useContext, ReactNode, useCallback } from "react";
 
 type CloseModalFn = () => void;
 
@@ -97,64 +97,67 @@ const ModalContext = createContext<ModalContextType | undefined>(undefined);
 export const ModalProvider = ({ children }: { children: ReactNode }) => {
   const [modalState, setModalState] = useState<ModalState | null>(null);
 
-  const openModal: OpenModal = (name: ModalName, props?: unknown) => {
-    switch (name) {
-      case "create-post-modal":
-        setModalState({
-          name,
-          props: (props ?? {}) as CreatePostModalProps,
-        });
-        break;
-      case "create-comment-modal":
-        setModalState({
-          name,
-          props: props as CreateCommentModalProps,
-        });
-        break;
-      case "delete-post-modal":
-        setModalState({
-          name,
-          props: props as DeletePostModalProps,
-        });
-        break;
-      case "edit-post-modal":
-        setModalState({
-          name,
-          props: props as EditPostModalProps,
-        });
-        break;
-      case "edit-user-modal":
-        setModalState({
-          name,
-          props: props as EditUserModalProps,
-        });
-        break;
-      case "edit-delete-message":
-        setModalState({
-          name,
-          props: props as EditDeleteMessageModalProps,
-        });
-        break;
-      case "following-modal":
-        setModalState({ name });
-        break;
-      case "followed-modal":
-        setModalState({ name });
-        break;
-      case "error-modal":
-        setModalState({
-          name,
-          props: props as ErrorModalProps,
-        });
-        break;
-      default:
-        break;
-    }
-  };
+  const openModal: OpenModal = useCallback(
+    (name: ModalName, props?: unknown) => {
+      switch (name) {
+        case "create-post-modal":
+          setModalState({
+            name,
+            props: (props ?? {}) as CreatePostModalProps,
+          });
+          break;
+        case "create-comment-modal":
+          setModalState({
+            name,
+            props: props as CreateCommentModalProps,
+          });
+          break;
+        case "delete-post-modal":
+          setModalState({
+            name,
+            props: props as DeletePostModalProps,
+          });
+          break;
+        case "edit-post-modal":
+          setModalState({
+            name,
+            props: props as EditPostModalProps,
+          });
+          break;
+        case "edit-user-modal":
+          setModalState({
+            name,
+            props: props as EditUserModalProps,
+          });
+          break;
+        case "edit-delete-message":
+          setModalState({
+            name,
+            props: props as EditDeleteMessageModalProps,
+          });
+          break;
+        case "following-modal":
+          setModalState({ name });
+          break;
+        case "followed-modal":
+          setModalState({ name });
+          break;
+        case "error-modal":
+          setModalState({
+            name,
+            props: props as ErrorModalProps,
+          });
+          break;
+        default:
+          break;
+      }
+    },
+    []
+  );
 
-  const closeModal = () => {
+  const closeModal = useCallback(() => {
     setModalState(null);
-  };
+  }, []);
 
   return (
     <ModalContext.Provider

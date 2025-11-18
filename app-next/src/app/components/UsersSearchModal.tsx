@@ -1,10 +1,17 @@
 "use client";
 
-import { useEffect, useState, useRef, useTransition } from "react";
+import {
+  useEffect,
+  useState,
+  useRef,
+  useTransition,
+  type ChangeEvent,
+} from "react";
 import Image from "next/image";
 import searchUser from "@/lib/api/searchUser";
 import Link from "next/link";
 import ProfileImage from "./ProfileImage";
+import { useModal } from "@/context/ModalContext";
 
 interface User {
   id: string;
@@ -18,6 +25,7 @@ export default function UsersSearchModal() {
   const [users, setUsers] = useState<User[]>([]);
   const [usersList, setUsersList] = useState<boolean>(false);
   const [isSearching, startTransition] = useTransition();
+  const { openModal } = useModal();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -35,7 +43,7 @@ export default function UsersSearchModal() {
     };
   }, []);
 
-  const handleSearchUsers = (event: any) => {
+  const handleSearchUsers = (event: ChangeEvent<HTMLInputElement>) => {
     const text = event.target.value;
 
     if (!text) {
@@ -54,6 +62,7 @@ export default function UsersSearchModal() {
           .catch((error: unknown) => {
             const message =
               error instanceof Error ? error.message : String(error);
+            openModal("error-modal", { message });
           });
       });
     }

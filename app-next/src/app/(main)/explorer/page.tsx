@@ -9,6 +9,7 @@ import toggleFollowUser from "@/lib/api/toggleFollowUser";
 import toggleFavPost from "@/lib/api/toggleFavPost";
 import Post from "@/app/components/Post";
 import ProfileImage from "@/app/components/ProfileImage";
+import { useModal } from "@/context/ModalContext";
 
 interface User {
   id: string;
@@ -43,6 +44,7 @@ export default function Explorer() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [isPending, startTransition] = useTransition();
   const [isUpdatingPosts, startPostsTransition] = useTransition();
+  const { openModal } = useModal();
 
   useEffect(() => {
     Promise.all([retrieveUsersNotFollowed(), retrievePostsNotFollowed()])
@@ -52,8 +54,9 @@ export default function Explorer() {
       })
       .catch((error: unknown) => {
         const message = error instanceof Error ? error.message : String(error);
+        openModal("error-modal", { message });
       });
-  }, []);
+  }, [openModal]);
 
   function handleFollowUser(userIdProfile: string) {
     startTransition(() => {
@@ -66,6 +69,7 @@ export default function Explorer() {
         .catch((error: unknown) => {
           const message =
             error instanceof Error ? error.message : String(error);
+          openModal("error-modal", { message });
         });
     });
   }
@@ -79,6 +83,7 @@ export default function Explorer() {
         .catch((error: unknown) => {
           const message =
             error instanceof Error ? error.message : String(error);
+          openModal("error-modal", { message });
         });
     });
   }
@@ -92,6 +97,7 @@ export default function Explorer() {
         .catch((error: unknown) => {
           const message =
             error instanceof Error ? error.message : String(error);
+          openModal("error-modal", { message });
         });
     });
   }
@@ -126,6 +132,7 @@ export default function Explorer() {
         .catch((error: unknown) => {
           const message =
             error instanceof Error ? error.message : String(error);
+          openModal("error-modal", { message });
         });
     });
   }

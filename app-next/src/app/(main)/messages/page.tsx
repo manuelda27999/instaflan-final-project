@@ -6,6 +6,7 @@ import Link from "next/link";
 import retrieveChats from "@/lib/api/retrieveChats";
 import retrieveUser from "@/lib/api/retrieveUser";
 import ProfileImage from "@/app/components/ProfileImage";
+import { useModal } from "@/context/ModalContext";
 
 interface Chat {
   id: string;
@@ -26,6 +27,7 @@ export default function Messages() {
   const [chats, setChats] = useState<Chat[]>([]);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const { openModal } = useModal();
 
   useEffect(() => {
     let active = true;
@@ -40,13 +42,14 @@ export default function Messages() {
         .catch((error: unknown) => {
           const message =
             error instanceof Error ? error.message : String(error);
+          openModal("error-modal", { message });
         });
     });
 
     return () => {
       active = false;
     };
-  }, []);
+  }, [openModal]);
 
   return (
     <section className="space-y-6 pb-20">

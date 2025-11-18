@@ -2,6 +2,7 @@
 
 import { useTransition } from "react";
 import createComment from "@/lib/api/createComment";
+import { useModal } from "@/context/ModalContext";
 
 interface CreateCommentModalProps {
   postId: string;
@@ -11,6 +12,7 @@ interface CreateCommentModalProps {
 
 export default function CreateCommentModal(props: CreateCommentModalProps) {
   const [isPending, startTransition] = useTransition();
+  const { openModal } = useModal();
 
   const handleSubmitComment = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -26,6 +28,7 @@ export default function CreateCommentModal(props: CreateCommentModalProps) {
         .catch((error: unknown) => {
           const message =
             error instanceof Error ? error.message : String(error);
+          openModal("error-modal", { message });
         });
     });
   };

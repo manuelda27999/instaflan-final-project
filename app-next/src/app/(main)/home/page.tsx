@@ -42,8 +42,9 @@ export default function AllPosts() {
       })
       .catch((error: unknown) => {
         const message = error instanceof Error ? error.message : String(error);
+        openModal("error-modal", { message });
       });
-  }, []);
+  }, [openModal]);
 
   useEffect(() => {
     loadPosts();
@@ -78,6 +79,7 @@ export default function AllPosts() {
         .catch((error: unknown) => {
           const message =
             error instanceof Error ? error.message : String(error);
+          openModal("error-modal", { message });
         });
     });
   }

@@ -2,6 +2,7 @@
 
 import { useTransition } from "react";
 import deletePost from "@/lib/api/deletePost";
+import { useModal } from "@/context/ModalContext";
 
 interface DeletePostModalProps {
   postId: string;
@@ -11,6 +12,7 @@ interface DeletePostModalProps {
 
 export default function DeletePostModal(props: DeletePostModalProps) {
   const [isPending, startTransition] = useTransition();
+  const { openModal } = useModal();
 
   const handleSubmitPost = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -23,6 +25,7 @@ export default function DeletePostModal(props: DeletePostModalProps) {
         .catch((error: unknown) => {
           const message =
             error instanceof Error ? error.message : String(error);
+          openModal("error-modal", { message });
           props.onHideDeletePost();
         });
     });

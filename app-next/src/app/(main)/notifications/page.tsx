@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState, useCallback, useTransition } from "react";
-import { useRouter } from "next/navigation";
 import Image from "next/image";
 
 import deleteNotification from "@/lib/api/deleteNotification";
@@ -9,6 +8,7 @@ import deleteAllNotifications from "@/lib/api/deleteAllNotifications";
 import retrieveNotifications from "@/lib/api/retrieveNotifications";
 import ProfileImage from "@/app/components/ProfileImage";
 import Link from "next/link";
+import { useModal } from "@/context/ModalContext";
 
 interface Notification {
   id: string;
@@ -26,16 +26,16 @@ interface Notification {
 export default function Notifications() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isPending, startTransition] = useTransition();
-
-  const router = useRouter();
+  const { openModal } = useModal();
 
   const loadNotifications = useCallback(() => {
     retrieveNotifications()
       .then((notifications) => setNotifications(notifications))
       .catch((error: unknown) => {
         const message = error instanceof Error ? error.message : String(error);
+        openModal("error-modal", { message });
       });
-  }, []);
+  }, [openModal]);
 
   useEffect(() => {
     loadNotifications();
@@ -48,6 +48,7 @@ export default function Notifications() {
         .catch((error: unknown) => {
           const message =
             error instanceof Error ? error.message : String(error);
+          openModal("error-modal", { message });
         });
     });
   };
@@ -59,6 +60,7 @@ export default function Notifications() {
         .catch((error: unknown) => {
           const message =
             error instanceof Error ? error.message : String(error);
+          openModal("error-modal", { message });
         });
     });
   };

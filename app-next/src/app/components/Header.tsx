@@ -2,10 +2,10 @@
 
 import { useState, useEffect, useTransition } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import Image from "next/image";
 import usePageTitle from "@/lib/helpers/usePageTittle";
 import UsersSearchModal from "@/app/components/UsersSearchModal";
 import { deleteSession } from "@/lib/helpers/session";
+import { useModal } from "@/context/ModalContext";
 
 export default function Header() {
   const pathname = usePathname();
@@ -14,6 +14,7 @@ export default function Header() {
   const [page, setPage] = useState("Instaflan");
   const pageTitle = usePageTitle(pathname);
   const [isPending, startTransition] = useTransition();
+  const { openModal } = useModal();
 
   useEffect(() => {
     setPage(pageTitle);
@@ -28,6 +29,7 @@ export default function Header() {
         .catch((error: unknown) => {
           const message =
             error instanceof Error ? error.message : String(error);
+          openModal("error-modal", { message });
         });
     });
   };
