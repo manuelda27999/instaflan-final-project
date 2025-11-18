@@ -118,7 +118,7 @@ export default function Chat() {
     participants.length > 0 ? participants : chat?.users ?? [];
 
   return (
-    <section className="relative flex flex-col items-center pb-18">
+    <section className="relative flex flex-col items-center pb-18 ">
       <div className="fixed w-5/6 max-w-4xl rounded-3xl border border-white/10 bg-white/5 px-4 py-3 shadow-[0_35px_120px_-70px_rgba(56,189,248,0.75)] backdrop-blur-xl sm:px-6">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-4">
