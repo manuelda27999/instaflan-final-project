@@ -99,7 +99,6 @@ export default function Profile() {
     try {
       createChat(context.token, userIdProfile)
         .then((chatId) => {
-          console.log(chatId);
           return navigate(`/messages/${chatId}`);
         })
         .catch((error) => alert(error.message));
