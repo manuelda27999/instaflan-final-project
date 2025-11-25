@@ -4,99 +4,37 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { usePathname } from "next/navigation";
 
-import retrieveUser from "@/lib/api/retrieveUser";
-import retrieveChats from "@/lib/api/retrieveChats";
 import ProfileImage from "./ProfileImage";
-import { useModal } from "@/context/ModalContext";
-import retrieveNotifications from "@/lib/api/retrieveNotifications";
+import { useUserContext } from "@/context/UserInfoContext";
 
-interface User {
+interface UserInfo {
   id: string;
   name: string;
-  image: string;
-}
-
-interface Chat {
-  id: string;
-  participants: string[];
-  unreadFor: string[];
-}
-
-interface Notification {
-  id: string;
-  text: string;
-  user: {
-    id: string;
-    name: string;
-    image: string;
-  };
-  post?: {
-    image: string;
-  };
+  avatarUrl: string;
+  messageCount: number;
+  notificationsCount: number;
 }
 
 export default function NavBar() {
   const pathname = usePathname();
-  const [userIdProfile, setUserIdProfile] = useState<string | null>(null);
-  const [user, setUser] = useState<User | null>(null);
-  const [messagesNotReading, setMessagesNotReading] = useState<number>(0);
-  const [notificationsNotReading, setNotificationsNotReading] =
-    useState<number>(0);
-  const { openModal } = useModal();
+  const [user, setUser] = useState<UserInfo | null>(null);
+  console.log("UserInfo in NavBar:", user);
+
+  const { userInfo, updateUserInfo } = useUserContext();
 
   useEffect(() => {
-    let active = true;
-    let currentUserId: string | null = null;
+    if (userInfo) {
+      setUser(userInfo);
+    }
+  }, [userInfo]);
 
-    const fetchChats = (userId: string | null) => {
-      retrieveChats()
-        .then((chats) => {
-          if (!active) return;
-
-          const counter = chats.reduce((total: number, chat: Chat) => {
-            if (!userId) return total;
-            return chat.unreadFor.includes(userId) ? total + 1 : total;
-          }, 0);
-
-          setMessagesNotReading(counter);
-        })
-        .catch((error: unknown) => {
-          const message =
-            error instanceof Error ? error.message : String(error);
-          openModal("error-modal", { message });
-        });
-    };
-
-    retrieveNotifications()
-      .then((notifications) => {
-        setNotificationsNotReading(notifications.length);
-        return;
-      })
-      .catch((error: unknown) => {
-        const message = error instanceof Error ? error.message : String(error);
-        openModal("error-modal", { message });
-      });
-
-    retrieveUser()
-      .then((userData) => {
-        if (!active) return;
-        setUser(userData);
-        currentUserId = userData?.id ?? null;
-        setUserIdProfile(currentUserId);
-        fetchChats(currentUserId);
-      })
-      .catch((error: unknown) => {
-        const message = error instanceof Error ? error.message : String(error);
-        openModal("error-modal", { message });
-      });
-    return () => {
-      active = false;
-    };
-  }, [openModal]);
+  useEffect(() => {
+    updateUserInfo();
+  }, [updateUserInfo]);
 
   const profileHref = useMemo(
-    () => (userIdProfile ? `/profile/${userIdProfile}/posts` : "#"),
-    [userIdProfile]
+    () => (user ? `/profile/${user.id}/posts` : "#"),
+    [user]
   );
 
   const navItems = [
@@ -114,7 +52,9 @@ export default function NavBar() {
           strokeLinejoin="round"
           aria-label="Home"
           focusable="false"
-          className={active ? "h-5 w-5 text-emerald-200" : "h-5 w-5 text-white"}
+          className={
+            active ? "h-5 w-5 text-emerald-600" : "h-5 w-5 text-slate-500"
+          }
         >
           <path d="M3.5 10.5L12 4l8.5 6.5" />
           <path d="M5 10.5V19a1.5 1.5 0 001.5 1.5H17.5A1.5 1.5 0 0019 19v-8.5" />
@@ -136,7 +76,9 @@ export default function NavBar() {
           strokeLinejoin="round"
           aria-label="Explore"
           focusable="false"
-          className={active ? "h-5 w-5 text-emerald-200" : "h-5 w-5 text-white"}
+          className={
+            active ? "h-5 w-5 text-emerald-600" : "h-5 w-5 text-slate-500"
+          }
         >
           <circle cx="12" cy="12" r="8.5" />
           <path d="M9.5 14.5l1.5-4.5 4.5-1.5-1.5 4.5-4.5 1.5z" />
@@ -157,7 +99,9 @@ export default function NavBar() {
           strokeLinejoin="round"
           aria-label="Messages"
           focusable="false"
-          className={active ? "h-5 w-5 text-emerald-200" : "h-5 w-5 text-white"}
+          className={
+            active ? "h-5 w-5 text-emerald-600" : "h-5 w-5 text-slate-500"
+          }
         >
           <path d="M3.5 5.5h17a1 1 0 011 1v10a1 1 0 01-1 1h-17a1 1 0 01-1-1v-10a1 1 0 011-1z" />
           <path d="M4.5 7.5l7.5 5 7.5-5" />
@@ -178,7 +122,9 @@ export default function NavBar() {
           strokeLinejoin="round"
           aria-label="Activity"
           focusable="false"
-          className={active ? "h-5 w-5 text-emerald-200" : "h-5 w-5 text-white"}
+          className={
+            active ? "h-5 w-5 text-emerald-600" : "h-5 w-5 text-slate-500"
+          }
         >
           <path d="M12 19.5l-6.16-6.16a4.25 4.25 0 010-6 4.25 4.25 0 016 0l.16.16.16-.16a4.25 4.25 0 016 6L12 19.5z" />
         </svg>
@@ -188,21 +134,22 @@ export default function NavBar() {
       label: "Profile",
       href: profileHref,
       isActive: (path: string) => path.startsWith("/profile"),
-      icon: () => user && <ProfileImage name={user.name} image={user.image} />,
+      icon: () =>
+        user && <ProfileImage name={user.name} image={user.avatarUrl} />,
     },
   ];
 
   return (
     <nav className="fixed inset-x-0 bottom-0 z-40 sm:pb-4 sm:px-6">
-      <div className="mx-auto max-w-5xl sm:rounded-3xl border border-white/10 bg-slate-900/70 px-3 py-3 shadow-[0_-35px_120px_-70px_rgba(56,189,248,0.65)] backdrop-blur-xl">
+      <div className="mx-auto max-w-5xl sm:rounded-2xl border border-slate-200 bg-white px-3 py-3 shadow-sm">
         <ul className="flex items-center justify-between gap-2">
           {navItems.map((item) => {
             const active = item.isActive(pathname);
             const baseClasses =
               "relative flex flex-1 items-center justify-center gap-2 rounded-2xl px-3 py-2 text-xs font-medium transition";
             const stateClasses = active
-              ? "bg-white/10 text-white shadow-inner shadow-emerald-500/20"
-              : "text-slate-300 hover:bg-white/5 hover:text-white";
+              ? "bg-emerald-50 text-emerald-700 border border-emerald-100"
+              : "text-slate-600 hover:bg-slate-100";
 
             const disabled = item.label === "Profile" && profileHref === "#";
 
@@ -213,25 +160,29 @@ export default function NavBar() {
                   className={`${baseClasses} ${stateClasses} ${
                     disabled ? "pointer-events-none opacity-60" : ""
                   }`}
-                  prefetch={item.label !== "Profile" || Boolean(userIdProfile)}
+                  prefetch={item.label !== "Profile" || Boolean(user)}
                 >
-                  {item.label === "Messages" && messagesNotReading > 0 && (
-                    <span className="absolute top-1 right-1 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-emerald-400 px-1 text-[0.65rem] font-semibold text-slate-900 shadow-lg">
-                      {messagesNotReading > 9 ? "9+" : messagesNotReading}
-                    </span>
-                  )}
-                  {item.label === "Activity" && notificationsNotReading > 0 && (
-                    <span className="absolute top-1 right-1 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-emerald-400 px-1 text-[0.65rem] font-semibold text-slate-900 shadow-lg">
-                      {notificationsNotReading > 9
-                        ? "9+"
-                        : notificationsNotReading}
-                    </span>
-                  )}
+                  {item.label === "Messages" &&
+                    user &&
+                    user?.messageCount > 0 && (
+                      <span className="absolute top-1 right-1 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-emerald-400 px-1 text-[0.65rem] font-semibold text-white shadow-sm">
+                        {user?.messageCount > 9 ? "9+" : user?.messageCount}
+                      </span>
+                    )}
+                  {item.label === "Activity" &&
+                    user &&
+                    user?.notificationsCount > 0 && (
+                      <span className="absolute top-1 right-1 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-emerald-400 px-1 text-[0.65rem] font-semibold text-white shadow-sm">
+                        {user?.notificationsCount > 9
+                          ? "9+"
+                          : user?.notificationsCount}
+                      </span>
+                    )}
                   <div
                     className={`flex h-10 w-10 min-h-10 min-w-10 items-center justify-center rounded-xl border overflow-hidden ${
                       active
-                        ? "border-emerald-300/50 bg-gradient-to-br from-emerald-300/20 via-teal-300/20 to-sky-300/20"
-                        : "border-white/10 bg-white/5"
+                        ? "border-emerald-200 bg-emerald-50"
+                        : "border-slate-200 bg-white"
                     }`}
                   >
                     {item.icon(active)}
