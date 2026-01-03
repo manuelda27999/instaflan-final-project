@@ -4,6 +4,7 @@
     "description": "",
     "main": "index.js",
     "scripts": {
+        "start": "node index.js",
         "test": "npx mocha ./logic/**/*.spec.js",
         "test-inspect": "npx mocha --inspect-brk",
         "test-coverage": "npx nyc --reporter=text --reporter=html npm run test"
